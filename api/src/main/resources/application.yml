@@ -1,0 +1,79 @@
+server:
+  shutdown: graceful
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  devtools:
+    restart:
+      enabled: false
+  rsocket:
+    server:
+      transport: websocket
+      port: 9090
+
+  data:
+    mongodb:
+      auto-index-creation: true
+      uuid-representation: standard
+spring.main.web-application-type: none
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: metrics, prometheus, health
+
+logging:
+  level:
+    root: ${chat.api.logging.level.root:DEBUG}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${chat.api.logging.level.mongo:DEBUG}
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+    io:
+      spring:
+        cloud: INFO
+
+---
+spring:
+  config:
+    import: classpath:aws-properties.yml
+    activate:
+      on-profile: local
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test
+---
+spring:
+  config:
+    import: classpath:aws-properties.yml
+    activate:
+      on-profile: default
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test
+
+---
+spring:
+  config:
+    import: classpath:aws-properties.yml
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    import: classpath:aws-properties.yml
+    activate:
+      on-profile: prod
