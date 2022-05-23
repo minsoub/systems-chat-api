@@ -6,15 +6,17 @@
 - Java version : JDK 13
 - Spring Boot : 2.6.7
 - Build : Gradle 7.4.1
+- Spring Webflux
 - Spring Data MongoDB Reactive
 - Spring Boot Actuator
 - Spring Boot Security
+- Rsocket
 
 ## **프로젝트 구조**
 
 - API
     - api
-    - com.bithumbsystems.chat.api.{project}
+    - com.bithumbsystems.chatMessage.api.{project}
         - domain 
             - controller
             - service
@@ -68,8 +70,6 @@
 - 추가로 persistence(data) 가 생길 경우, 별도 모듈 생성 후 사용 서비스에 주입
 
 ## Running the tests
-- Swagger 참고
-    - management: http://127.0.0.1:8081/swagger-ui.html
 - Docker
     - ./docker/docker-compose.yml
     - ```shell

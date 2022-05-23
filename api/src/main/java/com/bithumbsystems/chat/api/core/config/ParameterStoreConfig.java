@@ -1,19 +1,23 @@
 package com.bithumbsystems.chat.api.core.config;
 
-import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.*;
+import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_NAME;
+import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_URL;
+import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.PASSWORD;
+import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.PORT;
+import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.USER;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagement;
-import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagementClientBuilder;
-import com.amazonaws.services.simplesystemsmanagement.model.GetParameterRequest;
-import com.bithumbsystems.chat.api.core.config.property.AwsProperty;
-import com.bithumbsystems.chat.api.core.config.property.MongoProperty;
+import com.bithumbsystems.chat.api.core.config.property.AwsProperties;
+import com.bithumbsystems.chat.api.core.config.property.MongoProperties;
 import javax.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.ssm.SsmClient;
+import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
+import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 
 @Log4j2
 @Data
@@ -21,34 +25,25 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class ParameterStoreConfig {
 
-    private AWSSimpleSystemsManagement awsSimpleSystemsManagement;
+    private SsmClient ssmClient;
+    private MongoProperties mongoProperties;
 
-    private MongoProperty mongoProperty;
+    private final AwsProperties awsProperties;
 
-    private final AwsProperty awsProperty;
-
-    private final CredentialsProvider credentialsProvider;
+    @Value("${cloud.aws.credentials.profile-name}")
+    private String profileName;
 
     @PostConstruct
     public void init() {
 
-        log.debug("config store [prefix] => {}", awsProperty.getPrefix());
-        log.debug("config store [name] => {}", awsProperty.getParamStoreName());
-        log.debug("config store [profile] => {}", awsProperty.getProfileName());
+        log.debug("config store [prefix] => {}", awsProperties.getPrefix());
+        log.debug("config store [name] => {}", awsProperties.getParamStoreName());
 
-        log.debug("keyId => {}", credentialsProvider.getProvider().resolveCredentials().accessKeyId());
+        this.ssmClient = SsmClient.builder()
+            .region(Region.of(awsProperties.getRegion()))
+            .build();
 
-        BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(
-            credentialsProvider.getProvider().resolveCredentials().accessKeyId(),
-            credentialsProvider.getProvider().resolveCredentials().secretAccessKey()
-        );
-
-        this.awsSimpleSystemsManagement = AWSSimpleSystemsManagementClientBuilder
-                .standard()
-                .withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))
-                .withRegion(awsProperty.getRegion()).build();
-
-        this.mongoProperty = new MongoProperty(
+        this.mongoProperties = new MongoProperties(
             getParameterValue(DB_URL),
             getParameterValue(USER),
             getParameterValue(PASSWORD),
@@ -58,10 +53,15 @@ public class ParameterStoreConfig {
     }
 
     protected String getParameterValue(String type) {
-        String parameterName = String.format("%s/%s_%s/%s", awsProperty.getPrefix(), awsProperty.getParamStoreName(), awsProperty.getProfileName(), type);
-        GetParameterRequest request = new GetParameterRequest();
-        request.setName(parameterName);
-        request.setWithDecryption(true);
-        return awsSimpleSystemsManagement.getParameter(request).getParameter().getValue();
+        String parameterName = String.format("%s/%s_%s/%s", awsProperties.getPrefix(), awsProperties.getParamStoreName(), profileName, type);
+
+        GetParameterRequest request = GetParameterRequest.builder()
+            .name(parameterName)
+            .withDecryption(true)
+            .build();
+
+        GetParameterResponse response = this.ssmClient.getParameter(request);
+
+        return response.parameter().value();
     }
 }

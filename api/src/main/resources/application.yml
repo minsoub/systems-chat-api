@@ -10,11 +10,11 @@ spring:
     server:
       transport: websocket
       port: 9090
-
   data:
     mongodb:
       auto-index-creation: true
       uuid-representation: standard
+
 spring.main.web-application-type: none
 
 management:
@@ -32,7 +32,7 @@ logging:
         data:
           mongodb:
             core:
-              MongoTemplate: ${chat.api.logging.level.mongo:DEBUG}
+              MongoTemplate: ${chat.api.logging.level.mongo:INFO}
     com:
       amazonaws:
         util:
@@ -52,28 +52,17 @@ spring:
       host: localhost
       port: 27017
       database: test
----
-spring:
-  config:
-    import: classpath:aws-properties.yml
-    activate:
-      on-profile: default
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: test
 
 ---
 spring:
   config:
-    import: classpath:aws-properties.yml
+    import: classpath:aws-properties-dev.yml
     activate:
       on-profile: dev
 
 ---
 spring:
   config:
-    import: classpath:aws-properties.yml
+    import: classpath:aws-properties-dev.yml
     activate:
       on-profile: prod

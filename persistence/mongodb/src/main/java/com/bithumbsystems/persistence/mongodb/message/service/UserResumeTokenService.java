@@ -1,17 +1,19 @@
 package com.bithumbsystems.persistence.mongodb.message.service;
 
-import com.bithumbsystems.persistence.mongodb.message.model.UserResumeTokenDocument;
+import com.bithumbsystems.persistence.mongodb.message.model.entity.UserResumeToken;
+import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
 import com.bithumbsystems.persistence.mongodb.message.repository.UserResumeTokenRepository;
 import java.time.Clock;
+import java.util.UUID;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonTimestamp;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Slf4j
-@Component
+@Service
 public class UserResumeTokenService {
 
     private final UserResumeTokenRepository userResumeTokenRepository;
@@ -22,34 +24,28 @@ public class UserResumeTokenService {
         this.clock = clock;
     }
 
-    public void saveAndGenerateNewTokenFor(final String userName) {
-        log.info("Saving token for user {}", userName);
-        final var userToken = userResumeTokenRepository.findByUserName(userName)
-                .defaultIfEmpty(new UserResumeTokenDocument(userName))
+    public void saveAndGenerateNewTokenFor(final UUID accountId, final Role role) {
+        log.info("Saving token for user {}", accountId);
+        final var userToken = userResumeTokenRepository.findByAccountIdAndRole(accountId, role)
+                .defaultIfEmpty(new UserResumeToken(accountId, role))
                 .map(changeCurrentToken());
         userResumeTokenRepository.saveAll(userToken)
                 .subscribeOn(Schedulers.boundedElastic())
-                .doOnComplete(() -> log.info("User {} token saved ", userName))
+                .doOnComplete(() -> log.info("User {} token saved ", accountId))
                 .subscribe();
     }
 
-    private Function<UserResumeTokenDocument, UserResumeTokenDocument> changeCurrentToken() {
-        return userResumeTokenDocument -> {
+    private Function<UserResumeToken, UserResumeToken> changeCurrentToken() {
+        return userResumeToken -> {
             final long epochSecond = clock.instant().getEpochSecond();
-            userResumeTokenDocument.setTokenTimestamp(new BsonTimestamp((int) epochSecond, 0));
-            return userResumeTokenDocument;
+            userResumeToken.setTokenTimestamp(new BsonTimestamp((int) epochSecond, 0));
+            return userResumeToken;
         };
     }
 
-    public Mono<BsonTimestamp> getResumeTimestampFor(final String userName) {
-        return userResumeTokenRepository.findByUserName(userName)
-                .map(UserResumeTokenDocument::getTokenTimestamp)
+    public Mono<BsonTimestamp> getResumeTimestamp(final UUID accountId, final Role role) {
+        return userResumeTokenRepository.findByAccountIdAndRole(accountId, role)
+                .map(UserResumeToken::getTokenTimestamp)
                 .defaultIfEmpty(new BsonTimestamp((int) clock.instant().getEpochSecond(), 0));
-    }
-
-    public Mono<Boolean> deleteTokenForUser(final String username) {
-        return userResumeTokenRepository.deleteByUserName(username)
-                .map(deletedCount -> true)
-                .doOnSuccess(ignored -> log.info("Token for user {} deleted", username));
     }
 }

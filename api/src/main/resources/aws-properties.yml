@@ -8,6 +8,11 @@ cloud:
       bucket: ${aws.s3.bucket:lrc-dev-bucket}
     region:
       static: ${aws.region:ap-northeast-2}
+      auto: ${aws.region.auto:false}
     param-store:
+      enabled: true
+      fail-fast: true
       prefix: /smartadmin
       name: docdb
+
+

@@ -1,4 +1,4 @@
-package com.bithumbsystems.chat.api.message.model.request;
+package com.bithumbsystems.chat.api.v1.message.model.request;
 
 import lombok.Data;
 

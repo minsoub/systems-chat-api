@@ -1,4 +1,4 @@
-package com.bithumbsystems.chat.api.message.exception;
+package com.bithumbsystems.chat.api.v1.message.exception;
 
 import com.bithumbsystems.chat.api.core.model.enums.ErrorCode;
 import org.springframework.http.HttpStatus;
