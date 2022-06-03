@@ -1,12 +1,10 @@
 cloud:
   aws:
     credentials:
-      profile-name: ${aws.default.profile:dev}
+      profile-name: ${aws.default.profile:eks-dev}
       instanceProfile: true
     stack:
       auto: ${chat.aws.stack.auto:false}
-    s3:
-      bucket: ${chat.aws.s3.bucket:lrc-dev-bucket}
     region:
       static: ${chat.aws.region:ap-northeast-2}
       auto: ${chat.aws.region.auto:false}
@@ -14,4 +12,6 @@ cloud:
       enabled: true
       fail-fast: true
       prefix: /smartadmin
-      name: docdb
+      doc-name: docdb
+      redis-name: redis
+      kms-name: kms

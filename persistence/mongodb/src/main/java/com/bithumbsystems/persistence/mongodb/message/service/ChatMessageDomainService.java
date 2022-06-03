@@ -2,8 +2,7 @@ package com.bithumbsystems.persistence.mongodb.message.service;
 
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
 import com.bithumbsystems.persistence.mongodb.message.repository.ChatMessageRepository;
-import java.util.Set;
-import java.util.UUID;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonTimestamp;
@@ -22,8 +21,17 @@ public class ChatMessageDomainService {
         return chatMessageRepository.saveAll(chatMessages);
     }
 
-    public Flux<ChatMessage> changeStream(final Mono<Set<UUID>> chats, final BsonTimestamp bsonTimestamp) {
+    public Mono<ChatMessage> save(ChatMessage chatMessage) {
+        chatMessage.setCreateDate(LocalDateTime.now());
+        return chatMessageRepository.save(chatMessage);
+    }
+
+    public Flux<ChatMessage> changeStream(final String chatRoom, final String siteId, final BsonTimestamp bsonTimestamp) {
         return chatMessageRepository.changeStream(bsonTimestamp)
-            .filterWhen(message -> chats.map(chatIds -> chatIds.contains(message.getProjectId())));
+            .filterWhen(message -> Mono.just(message.getChatRoom().equals(chatRoom) && message.getSiteId().equals(siteId)));
+    }
+
+    public Flux<ChatMessage> findMessages(final String chatRoom, final String siteId) {
+        return chatMessageRepository.findAllByChatRoomAndSiteId(chatRoom, siteId);
     }
 }

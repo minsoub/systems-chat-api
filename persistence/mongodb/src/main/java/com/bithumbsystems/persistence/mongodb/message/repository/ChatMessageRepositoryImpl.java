@@ -20,7 +20,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageCustomRepository {
 
   @Override
   public Flux<ChatMessage> changeStream(final BsonTimestamp bsonTimestamp) {
-      return reactiveMongoTemplate.changeStream(ChatMessage .class)
+      return reactiveMongoTemplate.changeStream(ChatMessage.class)
           .watchCollection("chat_message")
           .resumeAt(bsonTimestamp)
           .listen()

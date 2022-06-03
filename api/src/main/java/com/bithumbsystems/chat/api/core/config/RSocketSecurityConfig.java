@@ -1,62 +1,61 @@
 package com.bithumbsystems.chat.api.core.config;
 
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.rsocket.RSocketStrategies;
-import org.springframework.messaging.rsocket.annotation.support.RSocketMessageHandler;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.rsocket.EnableRSocketSecurity;
 import org.springframework.security.config.annotation.rsocket.RSocketSecurity;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.messaging.handler.invocation.reactive.AuthenticationPrincipalArgumentResolver;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtReactiveAuthenticationManager;
 import org.springframework.security.rsocket.core.PayloadSocketAcceptorInterceptor;
 
 @Configuration
 @EnableRSocketSecurity
-@EnableReactiveMethodSecurity
 class RSocketSecurityConfig {
+
+    @Value("${jwt.secret}")
+    private String secret;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    RSocketMessageHandler messageHandler(final RSocketStrategies strategies) {
-        final var handler = new RSocketMessageHandler();
-        handler.getArgumentResolverConfigurer().addCustomResolver(new AuthenticationPrincipalArgumentResolver());
-        handler.setRSocketStrategies(strategies);
-        return handler;
+    public ReactiveJwtDecoder reactiveJwtDecoder() {
+        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), MacAlgorithm.HS256.getName());
+
+        return NimbusReactiveJwtDecoder.withSecretKey(secretKey)
+            .macAlgorithm(MacAlgorithm.HS256)
+            .build();
     }
 
     @Bean
-    MapReactiveUserDetailsService authentication() {
-        //This is NOT intended for production use (it is intended for getting started experience only)
-        final UserDetails user = User.withUsername("user1")
-                .password(passwordEncoder().encode("pass"))
-                .roles("USER")
-                .build();
-
-        final UserDetails user2 = User.withUsername("user2")
-                .password(passwordEncoder().encode("pass"))
-                .roles("NONE")
-                .build();
-
-        return new MapReactiveUserDetailsService(user, user2);
-    }
-
-    @Bean
-    PayloadSocketAcceptorInterceptor authorization(final RSocketSecurity security) {
-        security.authorizePayload(authorize ->
+    public PayloadSocketAcceptorInterceptor rsocketInterceptor(RSocketSecurity rsocket) {
+        rsocket.authorizePayload(authorize ->
                 authorize
-                        .setup().permitAll()
-                        .anyExchange().authenticated()
-        ).simpleAuthentication(Customizer.withDefaults());
-        return security.build();
+                    .setup().permitAll()
+                    .anyExchange().authenticated()
+            )
+            .jwt(jwtSpec -> {
+                try {
+                    jwtSpec.authenticationManager(jwtReactiveAuthenticationManager(reactiveJwtDecoder()));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+        return rsocket.build();
+    }
+
+
+    public ReactiveAuthenticationManager jwtReactiveAuthenticationManager(ReactiveJwtDecoder reactiveJwtDecoder) {
+        return new JwtReactiveAuthenticationManager(reactiveJwtDecoder);
     }
 }

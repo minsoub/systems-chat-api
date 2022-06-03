@@ -1,6 +1,5 @@
 package com.bithumbsystems.chat.api.v1.message.model.response;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public
 class ChatCreatedResponse {
-    UUID chatId;
+    String chatRoom;
 }

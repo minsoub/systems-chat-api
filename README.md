@@ -71,9 +71,9 @@
 
 ## Running the tests
 - Docker
-    - ./docker/docker-compose.yml
+    - ./docker/local/docker-compose.yml
     - ```shell
-      docker-compose -f /docker/docker-compose.yml up -d
+      docker-compose -f /docker/local/docker-compose.yml up -d
       ```
 
 - local에서 AWS EC2에러시 

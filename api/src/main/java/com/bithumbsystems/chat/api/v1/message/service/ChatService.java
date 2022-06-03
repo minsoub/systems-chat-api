@@ -3,14 +3,14 @@ package com.bithumbsystems.chat.api.v1.message.service;
 import com.bithumbsystems.chat.api.v1.message.model.Account;
 import com.bithumbsystems.chat.api.v1.message.model.mapper.MessageMapper;
 import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
+import com.bithumbsystems.chat.api.v1.message.model.response.ChatMessageResponse;
+import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
-import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatRoom;
 import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
+import com.bithumbsystems.persistence.mongodb.message.service.ChatChannelDomainService;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatMessageDomainService;
-import com.bithumbsystems.persistence.mongodb.message.service.ChatRoomDomainService;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,38 +26,50 @@ import reactor.core.scheduler.Schedulers;
 public
 class ChatService {
 
-    private final ChatRoomDomainService chatRoomDomainService;
+    private final ChatChannelDomainService chatChannelDomainService;
     private final ChatMessageDomainService chatMessageDomainService;
     private final MessageMapper messageMapper;
 
-    public Mono<Boolean> connectChatRoom(Account account) {
-       return chatRoomDomainService.findByAccountIdAndRoleAndProjectID(account.getAccountId(), account.getRole(), account.getProjectId())
-                .defaultIfEmpty(new ChatRoom(account.getAccountId(), account.getRole(), new HashSet<>()))
-                .map(chatRoom -> {
-                    chatRoom.addChat(account.getProjectId());
-                    return chatRoom;
-                })
-               .map(chatRoomDomainService::save)
-               .doOnNext(chatRoom -> log.info("saving document {}", chatRoom))
-               .map(chatRoom -> true);
+    public Flux<ChatMessageResponse> connectChatRoom(final Account account, final String chatRoom, final String siteId) {
+        return chatChannelDomainService.findByAccountIdAndRoleAndChatRoomsContains(account.getAccountId(), account.getRole(), chatRoom)
+            .as(chatChannel -> chatMessageDomainService.findMessages(chatRoom, siteId))
+            .log()
+            .defaultIfEmpty(new ChatMessage())
+            .flatMap(chatMessage -> Mono.just(messageMapper.chatMessageToChatMessageResponse(chatMessage)));
     }
 
-    public Mono<Set<UUID>> getChatRooms(final UUID accountId, final Role role) {
-        return chatRoomDomainService.findByAccountIdAndRole(accountId, role)
-                .doOnNext(chatRoom -> log.info("found user {} {}", chatRoom.getAccountId(), chatRoom.getRole()))
-                .flatMapIterable(ChatRoom::getProjects)
-                .collect(Collectors.toSet())
-                .doOnNext(uuids -> log.info("set size {}", uuids.size()))
-                .defaultIfEmpty(Set.of())
-                .doOnNext(uuids -> log.info("set size {}", uuids.size()));
+    public Mono<ChatChannel> createChatRoom(final Account account, final String chatRoom, final String siteId) {
+        ChatChannel chatChannel = new ChatChannel(account.getAccountId(), account.getRole(), new HashSet<>(), siteId);
+        chatChannel.addChatRoom(chatRoom);
+        return chatChannelDomainService.save(chatChannel);
     }
 
-    public Disposable saveMessages(Flux<MessageRequest> chatMessageRequests) {
-        final var chatMessages = chatMessageRequests.map(messageMapper::messageRequestToChatMessage);
-        return chatMessageDomainService.saveAll(chatMessages)
-          .then()
-          .subscribeOn(Schedulers.boundedElastic())
-          .doOnSubscribe(subscription -> log.info("subscribing to user input channel"))
-          .subscribe();
+    public Mono<Set<String>> getChatRooms(final String accountId, final Role role, final String siteId) {
+        return chatChannelDomainService.findByAccountIdAndRoleAndSiteId(accountId, role, siteId)
+            .doOnNext(chatChannel -> log.info("found user {} {}", chatChannel.getAccountId(), chatChannel.getRole()))
+            .flatMapIterable(ChatChannel::getChatRooms)
+            .collect(Collectors.toSet())
+            .doOnNext(uuids -> log.info("set size {}", uuids.size()))
+            .defaultIfEmpty(Set.of())
+            .doOnNext(uuids -> log.info("set size {}", uuids.size()));
+    }
+
+    public Disposable saveMessage(final MessageRequest chatMessageRequest, final Account account) {
+        if(chatMessageRequest.getContent().isEmpty()) {
+            return Flux.just(chatMessageRequest)
+                .then()
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnSubscribe(subscription -> log.info("subscribing to user input channel"))
+                .subscribe();
+        } else {
+            final var chatMessage = messageMapper.messageRequestToChatMessage(chatMessageRequest);
+            chatMessage.setAccountId(account.getAccountId());
+            chatMessage.setRole(account.getRole());
+            return chatMessageDomainService.save(chatMessage)
+                .then()
+                .subscribeOn(Schedulers.boundedElastic())
+                .doOnSubscribe(subscription -> log.info("subscribing to user input channel"))
+                .subscribe();
+        }
     }
 }

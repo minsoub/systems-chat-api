@@ -1,11 +1,15 @@
 package com.bithumbsystems.chat.api.v1.message.model.request;
 
-import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class JoinChatRequest {
-    UUID chatId;
+  private String chatRoom;
+  private String siteId;
 }

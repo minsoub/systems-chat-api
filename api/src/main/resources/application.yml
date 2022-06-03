@@ -14,6 +14,7 @@ spring:
     mongodb:
       auto-index-creation: true
       uuid-representation: standard
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
 spring.main.web-application-type: none
 
@@ -40,6 +41,10 @@ logging:
     io:
       spring:
         cloud: INFO
+  config: classpath:logback-spring-${spring.profiles.active}.xml
+
+jwt:
+  secret: ${chat.api.jwt.secret:testtesttesttesttesttesttesttest}
 
 ---
 spring:
