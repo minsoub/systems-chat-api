@@ -5,6 +5,8 @@ cloud:
       instanceProfile: true
     stack:
       auto: ${chat.aws.stack.auto:false}
+    s3:
+      bucket: ${chat.aws.s3.bucket:lrc-dev-bucket}
     region:
       static: ${chat.aws.region:ap-northeast-2}
       auto: ${chat.aws.region.auto:false}
@@ -12,6 +14,4 @@ cloud:
       enabled: true
       fail-fast: true
       prefix: /smartadmin
-      doc-name: docdb
-      redis-name: redis
-      kms-name: kms
+      name: docdb

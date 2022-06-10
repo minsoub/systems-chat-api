@@ -57,17 +57,29 @@ spring:
       host: localhost
       port: 27017
       database: test
-
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
 spring:
   config:
     import: classpath:aws-properties-dev.yml
     activate:
       on-profile: dev
-
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
+---
+spring:
+  config:
+    import: classpath:aws-properties-eks-dev.yml
+    activate:
+      on-profile: eks-dev
+logging:
+  config: classpath:logback-spring-dev.xml
 ---
 spring:
   config:
     import: classpath:aws-properties-dev.yml
     activate:
       on-profile: prod
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: systems-chat-api
+  namespace: NAMESPACE
+  labels:
+    app: systems-chat-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: systems-chat-api
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: systems-chat-api
+    spec:
+      containers:
+        - name: systems-chat-api
+          image: AWS_ECR_URI
+          ports:
+            - containerPort: 9090
+          resources: {}
