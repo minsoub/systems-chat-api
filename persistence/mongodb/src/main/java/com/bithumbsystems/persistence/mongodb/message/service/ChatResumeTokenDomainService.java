@@ -14,7 +14,7 @@ import reactor.core.scheduler.Schedulers;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ChatResumeTokenService {
+public class ChatResumeTokenDomainService {
 
     private final ChatResumeTokenRepository userResumeTokenRepository;
 
@@ -32,6 +32,7 @@ public class ChatResumeTokenService {
     private Function<ChatResumeToken, ChatResumeToken> changeCurrentToken() {
         return userResumeToken -> {
             final long epochSecond = Instant.now().getEpochSecond();
+            log.info("changeCurrentToken {}", epochSecond);
             userResumeToken.setTokenTimestamp(new BsonTimestamp((int) epochSecond, 0));
             return userResumeToken;
         };

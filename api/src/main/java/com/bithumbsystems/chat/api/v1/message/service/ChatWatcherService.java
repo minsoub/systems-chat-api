@@ -3,7 +3,7 @@ package com.bithumbsystems.chat.api.v1.message.service;
 import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
 import com.bithumbsystems.chat.api.v1.message.model.response.MessageResponse;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatMessageDomainService;
-import com.bithumbsystems.persistence.mongodb.message.service.ChatResumeTokenService;
+import com.bithumbsystems.persistence.mongodb.message.service.ChatResumeTokenDomainService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonTimestamp;
@@ -15,13 +15,13 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class ChatWatcherService {
 
-    private final ChatResumeTokenService resumeTokenService;
+    private final ChatResumeTokenDomainService resumeTokenService;
     private final ChatMessageDomainService chatMessageDomainService;
 
     public Flux<MessageResponse> sendMessages(final MessageRequest messageRequest) {
         return resumeTokenService.getResumeTimestamp(messageRequest.getSiteId(), messageRequest.getChatRoom())
             .flatMapMany(bsonTimestamp -> changeStream(messageRequest, bsonTimestamp))
-            .doOnCancel(() -> resumeTokenService.saveAndGenerateNewTokenFor(messageRequest.getSiteId(), messageRequest.getChatRoom()));
+            .doOnNext((f) -> resumeTokenService.saveAndGenerateNewTokenFor(messageRequest.getSiteId(), messageRequest.getChatRoom()));
     }
 
     private Flux<MessageResponse> changeStream(final MessageRequest messageRequest, final BsonTimestamp bsonTimestamp) {

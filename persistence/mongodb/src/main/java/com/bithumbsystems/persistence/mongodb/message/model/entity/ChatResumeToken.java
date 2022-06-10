@@ -18,17 +18,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class ChatResumeToken {
     @Id
     private String id;
-
-    private final String chatRoom;
-
     private final String siteId;
-
+    private final String chatRoom;
     @Setter
     private BsonTimestamp tokenTimestamp;
 
-    public ChatResumeToken(String chatRoom, String siteId) {
-        this.chatRoom = chatRoom;
+    public ChatResumeToken(String siteId, String chatRoom) {
         this.siteId = siteId;
+        this.chatRoom = chatRoom;
         this.id = String.valueOf(UUID.randomUUID());
         this.tokenTimestamp = new BsonTimestamp((int) Instant.now().getEpochSecond(), 0);
     }
