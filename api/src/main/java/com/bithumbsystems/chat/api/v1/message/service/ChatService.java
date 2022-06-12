@@ -15,10 +15,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Service
@@ -28,14 +26,12 @@ class ChatService {
 
     private final ChatChannelDomainService chatChannelDomainService;
     private final ChatMessageDomainService chatMessageDomainService;
-    private final MessageMapper messageMapper;
 
     public Flux<ChatMessageResponse> connectChatRoom(final Account account, final String chatRoom, final String siteId) {
         return chatChannelDomainService.findByAccountIdAndRoleAndChatRoomsContains(account.getAccountId(), account.getRole(), chatRoom)
             .as(chatChannel -> chatMessageDomainService.findMessages(chatRoom, siteId))
-            .log()
             .defaultIfEmpty(new ChatMessage())
-            .flatMap(chatMessage -> Mono.just(messageMapper.chatMessageToChatMessageResponse(chatMessage)));
+            .flatMap(chatMessage -> Mono.just(MessageMapper.INSTANCE.chatMessageToChatMessageResponse(chatMessage)));
     }
 
     public Mono<ChatChannel> createChatRoom(final Account account, final String chatRoom, final String siteId) {
@@ -54,22 +50,14 @@ class ChatService {
             .doOnNext(uuids -> log.info("set size {}", uuids.size()));
     }
 
-    public Disposable saveMessage(final MessageRequest chatMessageRequest, final Account account) {
-        if(chatMessageRequest.getContent().isEmpty()) {
-            return Flux.just(chatMessageRequest)
-                .then()
-                .subscribeOn(Schedulers.boundedElastic())
-                .doOnSubscribe(subscription -> log.info("subscribing to user input channel"))
-                .subscribe();
-        } else {
-            final var chatMessage = messageMapper.messageRequestToChatMessage(chatMessageRequest);
-            chatMessage.setAccountId(account.getAccountId());
-            chatMessage.setRole(account.getRole());
-            return chatMessageDomainService.save(chatMessage)
-                .then()
-                .subscribeOn(Schedulers.boundedElastic())
-                .doOnSubscribe(subscription -> log.info("subscribing to user input channel"))
-                .subscribe();
-        }
+    public Flux<ChatMessage> saveMessage(final Flux<MessageRequest> chatMessageRequests, final Account account) {
+        return chatMessageRequests.flatMap(chatMessageRequest -> saveMessage(chatMessageRequest, account));
+    }
+
+    public Mono<ChatMessage> saveMessage(final MessageRequest chatMessageRequest, final Account account) {
+        final var chatMessage = MessageMapper.INSTANCE.messageRequestToChatMessage(chatMessageRequest);
+        chatMessage.setAccountId(account.getAccountId());
+        chatMessage.setRole(account.getRole());
+        return chatMessageDomainService.save(chatMessage);
     }
 }

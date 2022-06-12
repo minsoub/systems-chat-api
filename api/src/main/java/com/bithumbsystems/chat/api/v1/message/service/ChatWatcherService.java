@@ -1,6 +1,6 @@
 package com.bithumbsystems.chat.api.v1.message.service;
 
-import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
+import com.bithumbsystems.chat.api.v1.message.model.request.ChannelRequest;
 import com.bithumbsystems.chat.api.v1.message.model.response.MessageResponse;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatMessageDomainService;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatResumeTokenDomainService;
@@ -18,14 +18,14 @@ public class ChatWatcherService {
     private final ChatResumeTokenDomainService resumeTokenService;
     private final ChatMessageDomainService chatMessageDomainService;
 
-    public Flux<MessageResponse> sendMessages(final MessageRequest messageRequest) {
-        return resumeTokenService.getResumeTimestamp(messageRequest.getSiteId(), messageRequest.getChatRoom())
-            .flatMapMany(bsonTimestamp -> changeStream(messageRequest, bsonTimestamp))
-            .doOnNext((f) -> resumeTokenService.saveAndGenerateNewTokenFor(messageRequest.getSiteId(), messageRequest.getChatRoom()));
+    public Flux<MessageResponse> channelMessages(final ChannelRequest channelRequest) {
+        return resumeTokenService.getResumeTimestamp(channelRequest.getSiteId(), channelRequest.getChatRoom())
+            .flatMapMany(bsonTimestamp -> changeStream(channelRequest, bsonTimestamp))
+            .doOnCancel(() -> resumeTokenService.saveAndGenerateNewTokenFor(channelRequest.getSiteId(), channelRequest.getChatRoom()));
     }
 
-    private Flux<MessageResponse> changeStream(final MessageRequest messageRequest, final BsonTimestamp bsonTimestamp) {
-        return chatMessageDomainService.changeStream(messageRequest.getChatRoom(), messageRequest.getSiteId(), bsonTimestamp)
+    private Flux<MessageResponse> changeStream(final ChannelRequest channelRequest, final BsonTimestamp bsonTimestamp) {
+        return chatMessageDomainService.changeStream(channelRequest.getChatRoom(), channelRequest.getSiteId(), bsonTimestamp)
             .map(chatMessage -> new MessageResponse(
                 chatMessage.getAccountId(),
                 chatMessage.getRole(),

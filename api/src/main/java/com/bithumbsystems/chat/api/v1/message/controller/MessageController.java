@@ -1,6 +1,8 @@
 package com.bithumbsystems.chat.api.v1.message.controller;
 
 import com.bithumbsystems.chat.api.v1.message.model.Account;
+import com.bithumbsystems.chat.api.v1.message.model.mapper.MessageMapper;
+import com.bithumbsystems.chat.api.v1.message.model.request.ChannelRequest;
 import com.bithumbsystems.chat.api.v1.message.model.request.JoinChatRequest;
 import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
 import com.bithumbsystems.chat.api.v1.message.model.response.ChatMessageResponse;
@@ -64,16 +66,17 @@ class MessageController {
         return chatService.getChatRooms(account.getAccountId(), account.getRole(), siteId);
     }
 
+    @MessageMapping("channel-chat-message")
+    public Flux<MessageResponse> sendMessagesChannel(final Flux<ChannelRequest> channelRequests, @AuthenticationPrincipal final Account account) {
+        return channelRequests.flatMap(channelRequest -> chatWatcherService.channelMessages(channelRequest)
+            .doOnNext(request -> log.info("Message reply {}", request))
+            .doOnSubscribe(subscription -> log.info("Subscribing to watcher : " + account.getAccountId()))
+            .doOnError(throwable -> log.error(throwable.getMessage())));
+    }
+
     @MessageMapping("send-chat-message")
-    public Flux<MessageResponse> sendMessages(final MessageRequest messageRequest, @AuthenticationPrincipal final Account account) {
-        final var incomingMessagesSubscription = chatService.saveMessage(messageRequest, account);
-        return chatWatcherService.sendMessages(messageRequest)
-                .doOnNext(request -> log.info("Message reply {}", request))
-                .doOnSubscribe(subscription -> log.info("Subscribing to watcher : " + account.getAccountId()))
-                .doOnCancel(() -> {
-                    log.info("Cancelled");
-                    incomingMessagesSubscription.dispose();
-                })
-                .doOnError(throwable -> log.error(throwable.getMessage()));
+    public Mono<ChatMessageResponse> sendMessages(final MessageRequest messageRequest, @AuthenticationPrincipal final Account account) {
+        return chatService.saveMessage(messageRequest, account)
+            .map(MessageMapper.INSTANCE::chatMessageToChatMessageResponse);
     }
 }
