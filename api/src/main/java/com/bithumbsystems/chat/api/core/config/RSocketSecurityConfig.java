@@ -29,10 +29,10 @@ class RSocketSecurityConfig {
     }
 
     public ReactiveJwtDecoder reactiveJwtDecoder() {
-        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), MacAlgorithm.HS256.getName());
+        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), MacAlgorithm.HS512.getName());
 
         return NimbusReactiveJwtDecoder.withSecretKey(secretKey)
-            .macAlgorithm(MacAlgorithm.HS256)
+            .macAlgorithm(MacAlgorithm.HS512)
             .build();
     }
 

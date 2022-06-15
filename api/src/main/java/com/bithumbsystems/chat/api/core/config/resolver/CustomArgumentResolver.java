@@ -28,7 +28,7 @@ public class CustomArgumentResolver extends AuthenticationPrincipalArgumentResol
         .flatMap((a) -> {
           Jwt principal = (Jwt) a.getPrincipal();
           var accountId = principal.getClaims().get("account_id").toString();
-          var role = principal.getClaims().get("role").toString();
+          var role = principal.getClaims().get("ROLE").toString();
         return Mono.just(new Account(accountId, Role.valueOf(role)));
         });
   }
