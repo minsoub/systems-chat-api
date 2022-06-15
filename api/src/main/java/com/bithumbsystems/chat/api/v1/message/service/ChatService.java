@@ -1,8 +1,9 @@
 package com.bithumbsystems.chat.api.v1.message.service;
 
-import com.bithumbsystems.chat.api.v1.message.model.mapper.MessageMapper;
+import com.bithumbsystems.chat.api.core.config.property.AwsProperties;
 import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
 import com.bithumbsystems.chat.api.v1.message.model.response.ChatMessageResponse;
+import com.bithumbsystems.chat.api.v1.message.util.AES256Util;
 import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
@@ -23,41 +24,66 @@ import reactor.core.publisher.Mono;
 public
 class ChatService {
 
-    private final ChatChannelDomainService chatChannelDomainService;
-    private final ChatMessageDomainService chatMessageDomainService;
+  private final AwsProperties awsProperties;
+  private final ChatChannelDomainService chatChannelDomainService;
+  private final ChatMessageDomainService chatMessageDomainService;
 
-    public Flux<ChatMessageResponse> connectChatRoom(final Account account, final String chatRoom, final String siteId) {
-        return chatChannelDomainService.findByAccountIdAndRoleAndChatRoomsContains(account.getAccountId(), account.getRole(), chatRoom)
-            .as(chatChannel -> chatMessageDomainService.findMessages(chatRoom, siteId))
-            .defaultIfEmpty(new ChatMessage())
-            .flatMap(chatMessage -> Mono.just(MessageMapper.INSTANCE.chatMessageToChatMessageResponse(chatMessage)));
-    }
+  public Flux<ChatMessageResponse> connectChatRoom(final Account account, final String chatRoom,
+      final String siteId) {
+    return chatChannelDomainService.findByAccountIdAndRoleAndChatRoomsContains(
+            account.getAccountId(), account.getRole(), chatRoom)
+        .as(chatChannel -> chatMessageDomainService.findMessages(chatRoom, siteId))
+        .defaultIfEmpty(new ChatMessage())
+        .flatMap(chatMessage -> Mono.just(ChatMessageResponse.builder()
+            .accountId(chatMessage.getAccountId())
+            .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
+            .role(chatMessage.getRole())
+            .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
+            .chatRoom(chatMessage.getChatRoom())
+            .createDate(chatMessage.getCreateDate())
+            .build()));
+  }
 
-    public Mono<ChatChannel> createChatRoom(final Account account, final String chatRoom, final String siteId) {
-        ChatChannel chatChannel = new ChatChannel(account.getAccountId(), account.getRole(), new HashSet<>(), siteId);
-        chatChannel.addChatRoom(chatRoom);
-        return chatChannelDomainService.save(chatChannel);
-    }
+  public Mono<ChatChannel> createChatRoom(final Account account, final String chatRoom,
+      final String siteId) {
+    ChatChannel chatChannel = new ChatChannel(account.getAccountId(), account.getRole(),
+        new HashSet<>(), siteId);
+    chatChannel.addChatRoom(chatRoom);
+    return chatChannelDomainService.save(chatChannel);
+  }
 
-    public Mono<Set<String>> getChatRooms(final Account account, final String siteId) {
-        return chatChannelDomainService.findByAccountIdAndRoleAndSiteId(account.getAccountId(), account.getRole(), siteId)
-            .doOnNext(chatChannel -> log.info("found user {} {}", chatChannel.getAccountId(), chatChannel.getRole()))
-            .flatMapIterable(ChatChannel::getChatRooms)
-            .collect(Collectors.toSet())
-            .doOnNext(uuids -> log.info("set size {}", uuids.size()))
-            .defaultIfEmpty(Set.of())
-            .doOnNext(uuids -> log.info("set size {}", uuids.size()));
-    }
+  public Mono<Set<String>> getChatRooms(final Account account, final String siteId) {
+    return chatChannelDomainService.findByAccountIdAndRoleAndSiteId(account.getAccountId(),
+            account.getRole(), siteId)
+        .doOnNext(chatChannel -> log.info("found user {} {}", chatChannel.getAccountId(),
+            chatChannel.getRole()))
+        .flatMapIterable(ChatChannel::getChatRooms)
+        .collect(Collectors.toSet())
+        .doOnNext(uuids -> log.info("set size {}", uuids.size()))
+        .defaultIfEmpty(Set.of())
+        .doOnNext(uuids -> log.info("set size {}", uuids.size()));
+  }
 
-    public Flux<ChatMessage> saveMessage(final Flux<MessageRequest> chatMessageRequests, final Account account) {
-        return chatMessageRequests.flatMap(chatMessageRequest -> saveMessage(chatMessageRequest, account));
-    }
-
-    public Mono<ChatMessage> saveMessage(final MessageRequest chatMessageRequest, final Account account) {
-        final var chatMessage = MessageMapper.INSTANCE.messageRequestToChatMessage(chatMessageRequest);
-        chatMessage.setAccountId(account.getAccountId());
-        chatMessage.setEmail(account.getEmail());
-        chatMessage.setRole(account.getRole());
-        return chatMessageDomainService.save(chatMessage);
-    }
+  public Mono<ChatMessageResponse> saveMessage(final MessageRequest chatMessageRequest,
+      final Account account) {
+    return chatMessageDomainService.save(
+            ChatMessage.builder()
+                .accountId(account.getAccountId())
+                .email(account.getEmail())
+                .role(account.getRole())
+                .content(AES256Util.encryptAES(awsProperties.getKmsKey(),
+                        chatMessageRequest.getContent(),
+                        true))
+                .chatRoom(chatMessageRequest.getChatRoom())
+                .siteId(chatMessageRequest.getSiteId())
+                .build()
+        ).flatMap(chatMessage -> Mono.just(ChatMessageResponse.builder()
+            .accountId(chatMessage.getAccountId())
+            .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
+            .role(chatMessage.getRole())
+            .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
+            .chatRoom(chatMessage.getChatRoom())
+            .createDate(chatMessage.getCreateDate())
+            .build()));
+  }
 }

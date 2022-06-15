@@ -1,7 +1,5 @@
 package com.bithumbsystems.chat.api.v1.message.controller;
 
-import com.bithumbsystems.persistence.mongodb.message.model.Account;
-import com.bithumbsystems.chat.api.v1.message.model.mapper.MessageMapper;
 import com.bithumbsystems.chat.api.v1.message.model.request.ChannelRequest;
 import com.bithumbsystems.chat.api.v1.message.model.request.JoinChatRequest;
 import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
@@ -9,6 +7,7 @@ import com.bithumbsystems.chat.api.v1.message.model.response.ChatMessageResponse
 import com.bithumbsystems.chat.api.v1.message.model.response.MessageResponse;
 import com.bithumbsystems.chat.api.v1.message.service.ChatService;
 import com.bithumbsystems.chat.api.v1.message.service.ChatWatcherService;
+import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatChannel;
 import java.util.Comparator;
 import java.util.List;
@@ -44,9 +43,7 @@ class MessageController {
 
     @MessageMapping("create-chat")
     public Mono<ChatChannel> createChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
-        log.info("Join Chat");
-        log.info("account: {}", account.toString());
-
+        log.info("Create Chat");
         return chatService.createChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId())
             .log();
     }
@@ -54,8 +51,6 @@ class MessageController {
     @MessageMapping("join-chat")
     public Mono<List<ChatMessageResponse>> joinChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
         log.info("Join Chat");
-        log.info("account: {}", account.toString());
-
         return chatService.connectChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId())
             .log()
             .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate));
@@ -76,7 +71,6 @@ class MessageController {
 
     @MessageMapping("send-chat-message")
     public Mono<ChatMessageResponse> sendMessages(final MessageRequest messageRequest, @AuthenticationPrincipal final Account account) {
-        return chatService.saveMessage(messageRequest, account)
-            .map(MessageMapper.INSTANCE::chatMessageToChatMessageResponse);
+        return chatService.saveMessage(messageRequest, account);
     }
 }

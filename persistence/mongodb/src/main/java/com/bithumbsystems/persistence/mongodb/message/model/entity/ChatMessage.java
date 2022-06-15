@@ -3,6 +3,7 @@ package com.bithumbsystems.persistence.mongodb.message.model.entity;
 import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("chat_message")
 @Getter
 @Setter
+@Builder
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor

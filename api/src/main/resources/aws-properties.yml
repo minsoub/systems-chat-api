@@ -13,6 +13,7 @@ cloud:
       enabled: true
       fail-fast: true
       prefix: /smartadmin
-      name: docdb
+      doc-name: docdb
+      kms-name: kms
 
 
