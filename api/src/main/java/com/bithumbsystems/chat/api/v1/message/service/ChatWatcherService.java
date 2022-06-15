@@ -28,6 +28,7 @@ public class ChatWatcherService {
         return chatMessageDomainService.changeStream(channelRequest.getChatRoom(), channelRequest.getSiteId(), bsonTimestamp)
             .map(chatMessage -> new MessageResponse(
                 chatMessage.getAccountId(),
+                chatMessage.getEmail(),
                 chatMessage.getRole(),
                 chatMessage.getContent(),
                 chatMessage.getChatRoom(),

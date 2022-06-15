@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ChatMessageResponse {
     String accountId;
+    String email;
     Role role;
     String content;
     String chatRoom;

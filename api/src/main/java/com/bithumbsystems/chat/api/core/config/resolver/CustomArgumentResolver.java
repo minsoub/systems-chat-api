@@ -1,6 +1,6 @@
 package com.bithumbsystems.chat.api.core.config.resolver;
 
-import com.bithumbsystems.chat.api.v1.message.model.Account;
+import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
@@ -28,8 +28,9 @@ public class CustomArgumentResolver extends AuthenticationPrincipalArgumentResol
         .flatMap((a) -> {
           Jwt principal = (Jwt) a.getPrincipal();
           var accountId = principal.getClaims().get("account_id").toString();
+          var email = principal.getClaims().get("iss").toString();
           var role = principal.getClaims().get("ROLE").toString();
-        return Mono.just(new Account(accountId, Role.valueOf(role)));
+        return Mono.just(new Account(accountId, email, role.equals(Role.USER.name()) ? Role.USER : Role.ADMIN));
         });
   }
 }

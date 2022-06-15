@@ -20,6 +20,7 @@ public class ChatMessage {
     @Id
     private String id;
     private String accountId;
+    private String email;
     private Role role;
     private String content;
     private String chatRoom;

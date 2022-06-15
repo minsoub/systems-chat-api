@@ -1,6 +1,6 @@
 package com.bithumbsystems.chat.api.v1.message.controller;
 
-import com.bithumbsystems.chat.api.v1.message.model.Account;
+import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.chat.api.v1.message.model.mapper.MessageMapper;
 import com.bithumbsystems.chat.api.v1.message.model.request.ChannelRequest;
 import com.bithumbsystems.chat.api.v1.message.model.request.JoinChatRequest;
@@ -63,7 +63,7 @@ class MessageController {
 
     @MessageMapping("get-chat-rooms")
     public Mono<Set<String>> getUserChats(final String siteId, @AuthenticationPrincipal final Account account) {
-        return chatService.getChatRooms(account.getAccountId(), account.getRole(), siteId);
+        return chatService.getChatRooms(account, siteId);
     }
 
     @MessageMapping("channel-chat-message")

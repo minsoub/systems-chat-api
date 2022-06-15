@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class MessageResponse {
     String accountId;
+    String email;
     Role role;
     String content;
     String chatRoom;

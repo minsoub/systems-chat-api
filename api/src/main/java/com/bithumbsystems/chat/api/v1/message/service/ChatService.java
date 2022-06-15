@@ -1,12 +1,11 @@
 package com.bithumbsystems.chat.api.v1.message.service;
 
-import com.bithumbsystems.chat.api.v1.message.model.Account;
 import com.bithumbsystems.chat.api.v1.message.model.mapper.MessageMapper;
 import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
 import com.bithumbsystems.chat.api.v1.message.model.response.ChatMessageResponse;
+import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
-import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatChannelDomainService;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatMessageDomainService;
 import java.util.HashSet;
@@ -40,8 +39,8 @@ class ChatService {
         return chatChannelDomainService.save(chatChannel);
     }
 
-    public Mono<Set<String>> getChatRooms(final String accountId, final Role role, final String siteId) {
-        return chatChannelDomainService.findByAccountIdAndRoleAndSiteId(accountId, role, siteId)
+    public Mono<Set<String>> getChatRooms(final Account account, final String siteId) {
+        return chatChannelDomainService.findByAccountIdAndRoleAndSiteId(account.getAccountId(), account.getRole(), siteId)
             .doOnNext(chatChannel -> log.info("found user {} {}", chatChannel.getAccountId(), chatChannel.getRole()))
             .flatMapIterable(ChatChannel::getChatRooms)
             .collect(Collectors.toSet())
@@ -57,6 +56,7 @@ class ChatService {
     public Mono<ChatMessage> saveMessage(final MessageRequest chatMessageRequest, final Account account) {
         final var chatMessage = MessageMapper.INSTANCE.messageRequestToChatMessage(chatMessageRequest);
         chatMessage.setAccountId(account.getAccountId());
+        chatMessage.setEmail(account.getEmail());
         chatMessage.setRole(account.getRole());
         return chatMessageDomainService.save(chatMessage);
     }
