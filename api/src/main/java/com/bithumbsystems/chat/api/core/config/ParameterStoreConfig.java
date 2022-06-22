@@ -27,8 +27,6 @@ public class ParameterStoreConfig {
 
     @Value("${cloud.aws.credentials.profile-name}")
     private String profileName;
-    private final AwsConfig awsConfig;
-
 
     @PostConstruct
     public void init() {
