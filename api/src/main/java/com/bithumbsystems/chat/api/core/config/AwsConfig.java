@@ -18,11 +18,12 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Getter
 @Setter
 @Configuration
-@Profile("dev|prod|eks-dev")
 @RequiredArgsConstructor
+@Profile("dev|prod|eks-dev")
 public class AwsConfig {
 
     private final AwsProperties awsProperties;
+
     @Value("${cloud.aws.credentials.profile-name}")
     private String profileName;
     private KmsAsyncClient kmsAsyncClient;
