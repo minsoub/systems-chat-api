@@ -17,7 +17,7 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 
 @SpringBootApplication(scanBasePackages = "com.bithumbsystems")
 @EnableWebFlux
-@ConfigurationPropertiesScan("com.bithumbsystems.chat.api.core.config")
+@ConfigurationPropertiesScan
 @EnableReactiveMongoRepositories("com.bithumbsystems.persistence.mongodb")
 @EnableReactiveMongoAuditing
 public class ChatApplication {
