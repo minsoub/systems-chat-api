@@ -3,11 +3,11 @@ package com.bithumbsystems.chat.api.core.config.property;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@Configuration
+@Component
 public class AwsProperties {
 
   @Value("${cloud.aws.s3.bucket}")
