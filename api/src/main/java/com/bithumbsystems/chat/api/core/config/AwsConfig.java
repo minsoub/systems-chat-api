@@ -3,6 +3,7 @@ package com.bithumbsystems.chat.api.core.config;
 import com.bithumbsystems.chat.api.core.config.property.AwsProperties;
 import javax.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,9 +19,10 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Setter
 @Configuration
 @Profile("dev|prod|eks-dev")
+@RequiredArgsConstructor
 public class AwsConfig {
 
-    private AwsProperties awsProperties;
+    private final AwsProperties awsProperties;
     @Value("${cloud.aws.credentials.profile-name}")
     private String profileName;
     private KmsAsyncClient kmsAsyncClient;

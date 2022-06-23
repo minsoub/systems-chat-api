@@ -41,6 +41,7 @@ logging:
     io:
       spring:
         cloud: INFO
+  config: classpath:logback-spring-${spring.profiles.active}.xml
 
 jwt:
   secret: ${chat.api.jwt.secret:eyJzdWIiOiJtaW5zb3ViQGJpdGh1bWJzeXN0ZW1zLmNvbSIsIm5hbWUiOiJCaXRodW1iU3lzdGVtcyIsImlhdCI6MjA5OTEyMzExMjF9.Lpo86rOQtvBRfVKDGhICUWuZ92rgBIVPM9PVAUiRhAM}
@@ -64,8 +65,8 @@ spring:
     import: classpath:aws-properties-dev.yml
     activate:
       on-profile: dev
-#logging:
-#  config: classpath:logback-spring-${spring.profiles.active}.xml
+logging:
+  config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
 spring:
   config:
