@@ -1,5 +1,7 @@
 package com.bithumbsystems.chat.api.core.config.resolver;
 
+import com.bithumbsystems.chat.api.v1.message.exception.ChatException;
+import com.bithumbsystems.chat.api.v1.message.model.enums.ErrorCode;
 import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
 import com.nimbusds.jose.shaded.json.JSONArray;
@@ -27,13 +29,22 @@ public class CustomArgumentResolver extends AuthenticationPrincipalArgumentResol
     // @formatter:off
     return ReactiveSecurityContextHolder.getContext()
         .map(SecurityContext::getAuthentication)
-        .flatMap((a) -> {
-          Jwt principal = (Jwt) a.getPrincipal();
+        .flatMap(authentication -> {
+          Jwt principal = (Jwt) authentication.getPrincipal();
           final var accountId = principal.getClaims().get("account_id").toString();
           final var email = principal.getClaims().get("iss").toString();
-          final var roles = (JSONArray)principal.getClaims().get("ROLE");
-          final var roleList = roles.stream().map(Object::toString).collect(Collectors.toList());
-          final var role = roleList.contains(Role.USER.name()) ? Role.USER : Role.ADMIN;
+          final var roleObject = principal.getClaims().get("ROLE");
+          var role = Role.USER;
+
+          if (roleObject instanceof String) {
+            role = Role.valueOf((String) principal.getClaims().get("ROLE"));
+          } else if(roleObject instanceof JSONArray)  {
+            final var roleList = ((JSONArray) roleObject).stream().map(Object::toString).collect(Collectors.toList());
+            role = roleList.contains(Role.USER.name()) ? Role.USER : Role.ADMIN;
+          } else {
+            return Mono.error(new ChatException(ErrorCode.INVALID_TOKEN));
+          }
+
           return Mono.just(new Account(accountId, email, role));
         });
   }
