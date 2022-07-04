@@ -37,7 +37,7 @@ public class CustomArgumentResolver extends AuthenticationPrincipalArgumentResol
           var role = Role.USER;
 
           if (roleObject instanceof String) {
-            role = Role.valueOf((String) principal.getClaims().get("ROLE"));
+            role = Role.valueOf((String) roleObject);
           } else if(roleObject instanceof JSONArray)  {
             final var roleList = ((JSONArray) roleObject).stream().map(Object::toString).collect(Collectors.toList());
             role = roleList.contains(Role.USER.name()) ? Role.USER : Role.ADMIN;
