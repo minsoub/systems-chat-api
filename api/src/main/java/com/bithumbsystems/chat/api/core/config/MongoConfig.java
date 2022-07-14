@@ -96,12 +96,11 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     }
 
     private ConnectionString getConnectionString() {
-        String str = String.format("mongodb://%s:%s@%s:%s/%s",
+        String str = String.format("mongodb://%s:%s@%s:%s",
             config.getMongoProperties().getMongodbUser(),
             config.getMongoProperties().getMongodbPassword(),
             config.getMongoProperties().getMongodbUrl(),
-            config.getMongoProperties().getMongodbPort(),
-            config.getMongoProperties().getMongodbName()
+            config.getMongoProperties().getMongodbPort()
         );
 
         return new ConnectionString(str);
