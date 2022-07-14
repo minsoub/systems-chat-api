@@ -16,6 +16,8 @@ spring:
       uuid-representation: standard
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
+spring.main.web-application-type: none
+
 management:
   endpoints:
     web:
