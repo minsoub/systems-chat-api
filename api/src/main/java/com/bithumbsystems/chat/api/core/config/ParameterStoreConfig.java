@@ -52,7 +52,7 @@ public class ParameterStoreConfig {
     }
 
     protected String getParameterValue(String storeName, String type) {
-        String parameterName = String.format("%s/%s_%s/%s", awsProperties.getPrefix(), storeName, "eks-temp", type);
+        String parameterName = String.format("%s/%s_%s/%s", awsProperties.getPrefix(), storeName, profileName, type);
 
         GetParameterRequest request = GetParameterRequest.builder()
             .name(parameterName)

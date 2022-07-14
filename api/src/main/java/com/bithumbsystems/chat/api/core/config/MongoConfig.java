@@ -45,11 +45,11 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     }
 
     @SneakyThrows
-    protected MongoClientSettings configureClientSettings() {
-        return MongoClientSettings.builder()
-            .streamFactoryFactory(NettyStreamFactoryFactory.builder().build())
-            .applyConnectionString(getConnectionString())
-            .build();
+        protected MongoClientSettings configureClientSettings() {
+            return MongoClientSettings.builder()
+                .streamFactoryFactory(NettyStreamFactoryFactory.builder().build())
+                .applyConnectionString(getConnectionString())
+                .build();
 
 //        MongoClientSettings.Builder builder = MongoClientSettings.builder();
 //        builder.applyConnectionString(getConnectionString());
@@ -96,7 +96,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     }
 
     private ConnectionString getConnectionString() {
-        String str = String.format("mongodb://%s:%s@%s:%s",
+        String str = String.format("mongodb://%s:%s@%s:%s?ssl=true&ssl_ca_certs=cert",
             config.getMongoProperties().getMongodbUser(),
             config.getMongoProperties().getMongodbPassword(),
             config.getMongoProperties().getMongodbUrl(),
