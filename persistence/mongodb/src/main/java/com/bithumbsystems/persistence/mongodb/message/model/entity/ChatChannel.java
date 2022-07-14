@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @Setter
 @CompoundIndexes({
-    @CompoundIndex(name = "role_account_id", def = "{'accountId' : 1, 'role': 1}", unique = true)
+    @CompoundIndex(name = "role_account_id", def = "{'account_id' : 1, 'role': 1}", unique = true)
 })
 @AllArgsConstructor
 @NoArgsConstructor

@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("chat_resume_token")
 @Getter
 @CompoundIndexes({
-    @CompoundIndex(name = "site_chat_room", def = "{'chatRoom' : 1, 'siteId': 1}", unique = true)
+    @CompoundIndex(name = "site_chat_room", def = "{'chat_room' : 1, 'site_id': 1}", unique = true)
 })
 public class ChatResumeToken {
     @Id
