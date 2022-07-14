@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
@@ -30,16 +28,6 @@ class MessageController {
     private final ChatService chatService;
     private final ChatWatcherService chatWatcherService;
 
-    @MessageMapping("{roomId}.message")
-    @Deprecated
-    public String test( @AuthenticationPrincipal final Account account, @Payload String message, @DestinationVariable String roomId) {
-        log.info(message);
-        log.info(account.toString());
-        log.info(roomId);
-
-        log.info("Creating new message");
-        return message;
-    }
 
     @MessageMapping("create-chat")
     public Mono<ChatChannel> createChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
