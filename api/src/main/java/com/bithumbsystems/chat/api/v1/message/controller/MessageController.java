@@ -28,6 +28,11 @@ class MessageController {
     private final ChatService chatService;
     private final ChatWatcherService chatWatcherService;
 
+    @MessageMapping("/")
+    public String health() {
+        log.info("Creating new message");
+        return "OK";
+    }
 
     @MessageMapping("create-chat")
     public Mono<ChatChannel> createChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
