@@ -9,15 +9,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("chat_channel")
 @Getter
 @Setter
-@CompoundIndexes({
-    @CompoundIndex(name = "role_account_id", def = "{'account_id' : 1, 'role': 1}", unique = true)
-})
+@CompoundIndex(name = "role_account_id", def = "{'account_id' : 1, 'role': 1}", unique = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatChannel {

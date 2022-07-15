@@ -7,14 +7,11 @@ import lombok.Setter;
 import org.bson.BsonTimestamp;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("chat_resume_token")
 @Getter
-@CompoundIndexes({
-    @CompoundIndex(name = "site_chat_room", def = "{'chat_room' : 1, 'site_id': 1}", unique = true)
-})
+@CompoundIndex(name = "site_chat_room", def = "{'chat_room' : 1, 'site_id': 1}", unique = true)
 public class ChatResumeToken {
     @Id
     private String id;
