@@ -7,6 +7,7 @@ import com.bithumbsystems.chat.api.v1.message.util.AES256Util;
 import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
+import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatChannelDomainService;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatMessageDomainService;
 import java.util.HashSet;
@@ -70,7 +71,7 @@ class ChatService {
     return chatMessageDomainService.save(
             ChatMessage.builder()
                 .accountId(account.getAccountId())
-                .email(AES256Util.encryptAES(awsProperties.getKmsKey(),
+                .email(account.getRole().equals(Role.USER) ? account.getEmail() : AES256Util.encryptAES(awsProperties.getKmsKey(),
                     account.getEmail(),
                     true))
                 .role(account.getRole())
