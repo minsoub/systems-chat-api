@@ -29,6 +29,7 @@ public class ChatWatcherService {
     private Flux<MessageResponse> changeStream(final ChannelRequest channelRequest, final BsonTimestamp bsonTimestamp) {
         return chatMessageDomainService.changeStream(channelRequest.getChatRoom(), channelRequest.getSiteId(), bsonTimestamp)
             .map(chatMessage -> new MessageResponse(
+                    chatMessage.getId(),
                 chatMessage.getAccountId(),
                 AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()),
                 chatMessage.getRole(),

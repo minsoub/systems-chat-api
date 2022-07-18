@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 @Builder
 public class MessageResponse {
+    String id;
     String accountId;
     String email;
     Role role;
