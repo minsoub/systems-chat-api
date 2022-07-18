@@ -3,6 +3,7 @@ package com.bithumbsystems.persistence.mongodb.message.service;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
 import com.bithumbsystems.persistence.mongodb.message.repository.ChatMessageRepository;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.BsonTimestamp;
@@ -23,6 +24,7 @@ public class ChatMessageDomainService {
 
     public Mono<ChatMessage> save(ChatMessage chatMessage) {
         chatMessage.setCreateDate(LocalDateTime.now());
+        chatMessage.setId(UUID.randomUUID().toString());
         return chatMessageRepository.save(chatMessage);
     }
 

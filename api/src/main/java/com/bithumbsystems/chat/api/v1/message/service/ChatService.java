@@ -69,7 +69,9 @@ class ChatService {
     return chatMessageDomainService.save(
             ChatMessage.builder()
                 .accountId(account.getAccountId())
-                .email(account.getEmail())
+                .email(AES256Util.encryptAES(awsProperties.getKmsKey(),
+                    account.getEmail(),
+                    true))
                 .role(account.getRole())
                 .content(AES256Util.encryptAES(awsProperties.getKmsKey(),
                         chatMessageRequest.getContent(),

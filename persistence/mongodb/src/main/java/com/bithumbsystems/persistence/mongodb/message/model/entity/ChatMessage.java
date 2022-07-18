@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("chat_message")
@@ -18,6 +19,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@CompoundIndex(name = "site_chat_room", def = "{'chat_room' : 1, 'site_id': 1}")
 public class ChatMessage {
     @Id
     private String id;
