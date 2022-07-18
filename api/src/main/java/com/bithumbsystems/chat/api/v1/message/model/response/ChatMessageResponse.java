@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class ChatMessageResponse {
+    String id;
     String accountId;
     String email;
     Role role;
