@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: systems-dev-ns
+  name: systems-chat-api-external-alb
+spec:
+  type: LoadBalancer
+  selector:
+    app: systems-chat-api-nlb
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
