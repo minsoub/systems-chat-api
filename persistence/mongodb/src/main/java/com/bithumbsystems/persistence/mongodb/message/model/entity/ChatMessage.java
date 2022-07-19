@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@CompoundIndex(name = "site_chat_room", def = "{'chat_room' : 1, 'site_id': 1}")
+@CompoundIndex(name = "site_chat_room", def = "{'chat_room' : 1, 'site_id': 1, 'is_delete': 1}")
 public class ChatMessage {
     @Id
     private String id;
@@ -31,6 +31,7 @@ public class ChatMessage {
     private String content;
     private String chatRoom;
     private String siteId;
+    private Boolean isDelete;
     private LocalDateTime createDate;
 
     @Transient

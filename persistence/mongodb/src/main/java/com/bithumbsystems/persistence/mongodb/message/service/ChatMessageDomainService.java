@@ -34,6 +34,6 @@ public class ChatMessageDomainService {
     }
 
     public Flux<ChatMessage> findMessages(final String chatRoom, final String siteId) {
-        return chatMessageRepository.findAllByChatRoomAndSiteId(chatRoom, siteId);
+        return chatMessageRepository.findAllByChatRoomAndSiteIdAndIsDeleteFalse(chatRoom, siteId);
     }
 }

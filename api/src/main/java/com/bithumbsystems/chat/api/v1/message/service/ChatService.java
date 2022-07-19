@@ -79,6 +79,7 @@ class ChatService {
                         chatMessageRequest.getContent(),
                         true))
                 .chatRoom(chatMessageRequest.getChatRoom())
+                .isDelete(false)
                 .siteId(chatMessageRequest.getSiteId())
                 .build()
         ).flatMap(chatMessage -> Mono.just(ChatMessageResponse.builder()
