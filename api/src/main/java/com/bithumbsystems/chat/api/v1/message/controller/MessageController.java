@@ -37,15 +37,13 @@ class MessageController {
     @MessageMapping("create-chat")
     public Mono<ChatChannel> createChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
         log.info("Create Chat");
-        return chatService.createChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId())
-            .log();
+        return chatService.createChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId());
     }
 
     @MessageMapping("join-chat")
     public Mono<List<ChatMessageResponse>> joinChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
         log.info("Join Chat");
         return chatService.connectChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId())
-            .log()
             .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate));
     }
 

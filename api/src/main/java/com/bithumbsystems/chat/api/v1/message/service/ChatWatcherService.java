@@ -36,6 +36,7 @@ public class ChatWatcherService {
                 AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()),
                 chatMessage.getChatRoom(),
                 chatMessage.getSiteId(),
+                chatMessage.getOperationType(),
                 chatMessage.getCreateDate())
             );
     }

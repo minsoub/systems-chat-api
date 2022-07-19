@@ -1,6 +1,7 @@
 package com.bithumbsystems.persistence.mongodb.message.model.entity;
 
 import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
+import com.mongodb.client.model.changestream.OperationType;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -30,4 +32,7 @@ public class ChatMessage {
     private String chatRoom;
     private String siteId;
     private LocalDateTime createDate;
+
+    @Transient
+    private OperationType operationType;
 }
