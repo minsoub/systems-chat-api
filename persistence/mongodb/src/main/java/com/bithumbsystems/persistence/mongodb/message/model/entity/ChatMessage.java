@@ -32,6 +32,7 @@ public class ChatMessage {
     private String chatRoom;
     private String siteId;
     private Boolean isDelete;
+    private LocalDateTime deleteDate;
     private LocalDateTime createDate;
 
     @Transient
