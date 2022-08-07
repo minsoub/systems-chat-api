@@ -14,6 +14,7 @@ public class MessageResponse {
     String id;
     String accountId;
     String email;
+    String name;
     Role role;
     String content;
     String chatRoom;

@@ -9,4 +9,5 @@ public class MessageRequest {
     String content;
     String chatRoom;
     String siteId;
+    String name;
 }

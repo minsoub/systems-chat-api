@@ -39,6 +39,7 @@ class ChatService {
             .id(chatMessage.getId())
             .accountId(chatMessage.getAccountId())
             .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
+            .name(chatMessage.getName())  // new add
             .role(chatMessage.getRole())
             .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
             .chatRoom(chatMessage.getChatRoom())
@@ -74,6 +75,7 @@ class ChatService {
                 .email(account.getRole().equals(Role.USER) ? account.getEmail() : AES256Util.encryptAES(awsProperties.getKmsKey(),
                     account.getEmail(),
                     true))
+                .name(chatMessageRequest.getName())  // new add
                 .role(account.getRole())
                 .content(AES256Util.encryptAES(awsProperties.getKmsKey(),
                         chatMessageRequest.getContent(),
@@ -86,6 +88,7 @@ class ChatService {
             .id(chatMessage.getId())
             .accountId(chatMessage.getAccountId())
             .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
+            .name(chatMessage.getName()) // new add
             .role(chatMessage.getRole())
             .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
             .chatRoom(chatMessage.getChatRoom())
