@@ -15,5 +15,6 @@ cloud:
       prefix: /smartadmin
       doc-name: docdb
       kms-name: kms
+      auth-name: auth
 
 

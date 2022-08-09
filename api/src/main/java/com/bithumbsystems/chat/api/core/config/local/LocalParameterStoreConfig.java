@@ -5,6 +5,7 @@ import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreCon
 import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_PORT;
 import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_URL;
 import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_USER;
+import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.JWT_SECRET_KEY;
 import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.KMS_ALIAS_NAME;
 
 import com.bithumbsystems.chat.api.core.config.property.AwsProperties;
@@ -56,6 +57,7 @@ public class LocalParameterStoreConfig {
 
         // KMS Parameter Key
         this.awsProperties.setKmsKey(getParameterValue(awsProperties.getParamStoreKmsName(), KMS_ALIAS_NAME));
+        this.awsProperties.setJwtSecretKey(getParameterValue(awsProperties.getParamStoreAuthName(), JWT_SECRET_KEY));
     }
 
     protected String getParameterValue(String storeName, String type) {

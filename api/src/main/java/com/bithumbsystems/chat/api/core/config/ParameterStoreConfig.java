@@ -48,6 +48,7 @@ public class ParameterStoreConfig {
 
         // KMS Parameter Key
         this.awsProperties.setKmsKey(getParameterValue(awsProperties.getParamStoreKmsName(), KMS_ALIAS_NAME));
+        this.awsProperties.setJwtSecretKey(getParameterValue(awsProperties.getParamStoreAuthName(), JWT_SECRET_KEY));
 
     }
 

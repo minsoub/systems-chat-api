@@ -1,7 +1,8 @@
 package com.bithumbsystems.chat.api.core.config;
 
+import com.bithumbsystems.chat.api.core.config.property.AwsProperties;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -17,11 +18,10 @@ import org.springframework.security.rsocket.core.PayloadSocketAcceptorIntercepto
 
 @Configuration
 @EnableRSocketSecurity
+@RequiredArgsConstructor
 class RSocketSecurityConfig {
 
-    @Value("${jwt.secret}")
-    private String secret;
-
+    private final AwsProperties awsProperties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -29,7 +29,7 @@ class RSocketSecurityConfig {
     }
 
     public ReactiveJwtDecoder reactiveJwtDecoder() {
-        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), MacAlgorithm.HS512.getName());
+        SecretKeySpec secretKey = new SecretKeySpec(awsProperties.getJwtSecretKey().getBytes(), MacAlgorithm.HS512.getName());
 
         return NimbusReactiveJwtDecoder.withSecretKey(secretKey)
             .macAlgorithm(MacAlgorithm.HS512)
