@@ -73,13 +73,11 @@ class ChatService {
             ChatMessage.builder()
                 .accountId(account.getAccountId())
                 .email(account.getRole().equals(Role.USER) ? account.getEmail() : AES256Util.encryptAES(awsProperties.getKmsKey(),
-                    account.getEmail(),
-                    true))
+                    account.getEmail()))
                 .name(chatMessageRequest.getName())  // new add
                 .role(account.getRole())
                 .content(AES256Util.encryptAES(awsProperties.getKmsKey(),
-                        chatMessageRequest.getContent(),
-                        true))
+                        chatMessageRequest.getContent()))
                 .chatRoom(chatMessageRequest.getChatRoom())
                 .isDelete(false)
                 .siteId(chatMessageRequest.getSiteId())
