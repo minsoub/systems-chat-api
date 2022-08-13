@@ -75,7 +75,7 @@ class ChatService {
                         account.getEmail(), awsProperties.getSaltKey(), awsProperties.getIvKey()))
                 .name(AES256Util.encryptAES(
                     awsProperties.getKmsKey(),
-                    AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessageRequest.getName()),
+                    AES256Util.decryptAES(awsProperties.getCryptoKey(), chatMessageRequest.getName()),
                     awsProperties.getSaltKey(),
                     awsProperties.getIvKey()
                 ))  // new add

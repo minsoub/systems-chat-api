@@ -1,5 +1,6 @@
 package com.bithumbsystems.chat.api.core.config.local;
 
+import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.CRYPTO_KEY;
 import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_NAME;
 import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_PASSWORD;
 import static com.bithumbsystems.chat.api.core.config.constant.ParameterStoreConstant.DB_PORT;
@@ -61,6 +62,7 @@ public class LocalParameterStoreConfig {
         this.awsProperties.setIvKey(getParameterValue(awsProperties.getParamStoreIvName(), KMS_ALIAS_NAME));
         log.debug(">> DB Crypto:{}, {}, {}", this.awsProperties.getKmsKey(), this.awsProperties.getSaltKey(), this.awsProperties.getIvKey());
         this.awsProperties.setJwtSecretKey(getParameterValue(awsProperties.getParamStoreAuthName(), JWT_SECRET_KEY));
+        this.awsProperties.setCryptoKey(getParameterValue(awsProperties.getParamCryptoName(), CRYPTO_KEY));
     }
 
     protected String getParameterValue(String storeName, String type) {
