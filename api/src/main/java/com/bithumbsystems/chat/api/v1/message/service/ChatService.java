@@ -7,7 +7,6 @@ import com.bithumbsystems.chat.api.v1.message.util.AES256Util;
 import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatChannel;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
-import com.bithumbsystems.persistence.mongodb.message.model.enums.Role;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatChannelDomainService;
 import com.bithumbsystems.persistence.mongodb.message.service.ChatMessageDomainService;
 import java.util.HashSet;
@@ -39,7 +38,7 @@ class ChatService {
             .id(chatMessage.getId())
             .accountId(chatMessage.getAccountId())
             .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
-            .name(chatMessage.getName())  // new add
+            .name(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getName()))  // new add
             .role(chatMessage.getRole())
             .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
             .chatRoom(chatMessage.getChatRoom())
@@ -74,7 +73,12 @@ class ChatService {
                 .accountId(account.getAccountId())
                 .email(AES256Util.encryptAES(awsProperties.getKmsKey(),
                         account.getEmail(), awsProperties.getSaltKey(), awsProperties.getIvKey()))
-                .name(chatMessageRequest.getName())  // new add
+                .name(AES256Util.encryptAES(
+                    awsProperties.getKmsKey(),
+                    AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessageRequest.getName()),
+                    awsProperties.getSaltKey(),
+                    awsProperties.getIvKey()
+                ))  // new add
                 .role(account.getRole())
                 .content(AES256Util.encryptAES(awsProperties.getKmsKey(),
                         chatMessageRequest.getContent(), awsProperties.getSaltKey(), awsProperties.getIvKey()))
@@ -86,7 +90,7 @@ class ChatService {
             .id(chatMessage.getId())
             .accountId(chatMessage.getAccountId())
             .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
-            .name(chatMessage.getName()) // new add
+            .name(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getName())) // new add
             .role(chatMessage.getRole())
             .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
             .chatRoom(chatMessage.getChatRoom())
