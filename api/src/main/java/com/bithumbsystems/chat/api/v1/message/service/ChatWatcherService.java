@@ -32,7 +32,7 @@ public class ChatWatcherService {
                     chatMessage.getId(),
                 chatMessage.getAccountId(),
                 AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()),
-                chatMessage.getName(), // new add
+                AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getName()), // new add
                 chatMessage.getRole(),
                 AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()),
                 chatMessage.getChatRoom(),
