@@ -72,12 +72,12 @@ class ChatService {
     return chatMessageDomainService.save(
             ChatMessage.builder()
                 .accountId(account.getAccountId())
-                .email(account.getRole().equals(Role.USER) ? account.getEmail() : AES256Util.encryptAES(awsProperties.getKmsKey(),
-                    account.getEmail()))
+                .email(AES256Util.encryptAES(awsProperties.getKmsKey(),
+                        account.getEmail(), awsProperties.getSaltKey(), awsProperties.getIvKey()))
                 .name(chatMessageRequest.getName())  // new add
                 .role(account.getRole())
                 .content(AES256Util.encryptAES(awsProperties.getKmsKey(),
-                        chatMessageRequest.getContent()))
+                        chatMessageRequest.getContent(), awsProperties.getSaltKey(), awsProperties.getIvKey()))
                 .chatRoom(chatMessageRequest.getChatRoom())
                 .isDelete(false)
                 .siteId(chatMessageRequest.getSiteId())

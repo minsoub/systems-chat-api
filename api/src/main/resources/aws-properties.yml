@@ -16,5 +16,6 @@ cloud:
       doc-name: docdb
       kms-name: kms
       auth-name: auth
-
+      salt-name: salt
+      iv-name: iv
 
