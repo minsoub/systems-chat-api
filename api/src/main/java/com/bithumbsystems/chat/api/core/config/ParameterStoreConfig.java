@@ -14,6 +14,8 @@ import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.GetParameterRequest;
 import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 
+import java.net.URI;
+
 @Log4j2
 @Data
 @Profile("dev|qa|prod|eks-dev")
