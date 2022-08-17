@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.ssm.model.GetParameterResponse;
 
 @Log4j2
 @Data
-@Profile("dev|prod|eks-dev")
+@Profile("dev|qa|prod|eks-dev")
 @Configuration
 public class ParameterStoreConfig {
 
@@ -36,6 +36,7 @@ public class ParameterStoreConfig {
 
         this.ssmClient = SsmClient.builder()
             .region(Region.of(awsProperties.getRegion()))
+            .endpointOverride(URI.create(awsProperties.getSsmEndPoint()))
             .build();
 
         this.mongoProperties = new MongoProperties(

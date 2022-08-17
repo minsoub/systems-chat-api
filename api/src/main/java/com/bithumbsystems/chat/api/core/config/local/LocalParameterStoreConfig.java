@@ -46,6 +46,7 @@ public class LocalParameterStoreConfig {
         this.ssmClient = SsmClient.builder()
                 .credentialsProvider(credentialsProvider.getProvider()) // 로컬에서 개발로 붙을때 사용
                 .region(Region.of(awsProperties.getRegion()))
+                .endpointOverride(URI.create(awsProperties.getSsmEndPoint()))
                 .build();
 
         this.mongoProperties = new MongoProperties(

@@ -45,6 +45,7 @@ public class LocalAwsConfig {
         kmsAsyncClient = KmsAsyncClient.builder()
             .region(Region.of(awsProperties.getRegion()))
             .credentialsProvider(ProfileCredentialsProvider.create(profileName))
+            .endpointOverride(URI.create(awsProperties.getKmsEndPoint()))
             .build();
 
         provider = new com.amazonaws.auth.profile.ProfileCredentialsProvider(profileName);

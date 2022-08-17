@@ -16,7 +16,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Getter
 @Setter
 @Configuration
-@Profile("dev|prod|eks-dev")
+@Profile("dev|qa|prod|eks-dev")
 public class AwsConfig {
 
     private final AwsProperties awsProperties;
@@ -38,6 +38,7 @@ public class AwsConfig {
     public void init() {
         kmsAsyncClient = KmsAsyncClient.builder()
             .region(Region.of(awsProperties.getRegion()))
+            .endpointOverride(URI.create(awsProperties.getKmsEndPoint()))
             .build();
     }
 
