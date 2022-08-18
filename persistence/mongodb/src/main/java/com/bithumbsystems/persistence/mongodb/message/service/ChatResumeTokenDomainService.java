@@ -19,20 +19,20 @@ public class ChatResumeTokenDomainService {
     private final ChatResumeTokenRepository userResumeTokenRepository;
 
     public void saveAndGenerateNewTokenFor(final String siteId, final String chatRoom) {
-        log.info("Saving token for {} {}", siteId, chatRoom);
+        log.debug("Saving token for {} {}", siteId, chatRoom);
         final var userToken = userResumeTokenRepository.findBySiteIdAndChatRoom(siteId, chatRoom)
                 .defaultIfEmpty(new ChatResumeToken(siteId, chatRoom))
                 .map(changeCurrentToken());
         userResumeTokenRepository.saveAll(userToken)
                 .subscribeOn(Schedulers.boundedElastic())
-                .doOnComplete(() -> log.info("Saving token for {} {}", siteId, chatRoom))
+                .doOnComplete(() -> log.debug("Saving token for {} {}", siteId, chatRoom))
                 .subscribe();
     }
 
     private Function<ChatResumeToken, ChatResumeToken> changeCurrentToken() {
         return userResumeToken -> {
             final long epochSecond = Instant.now().getEpochSecond();
-            log.info("changeCurrentToken {}", epochSecond);
+            log.debug("changeCurrentToken {}", epochSecond);
             userResumeToken.setTokenTimestamp(new BsonTimestamp((int) epochSecond, 0));
             return userResumeToken;
         };

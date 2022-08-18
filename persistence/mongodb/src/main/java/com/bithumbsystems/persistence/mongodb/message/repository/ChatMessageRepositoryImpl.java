@@ -1,5 +1,9 @@
 package com.bithumbsystems.persistence.mongodb.message.repository;
 
+import static com.mongodb.client.model.changestream.OperationType.INSERT;
+import static com.mongodb.client.model.changestream.OperationType.REPLACE;
+import static com.mongodb.client.model.changestream.OperationType.UPDATE;
+
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,8 +11,6 @@ import org.bson.BsonTimestamp;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
-
-import static com.mongodb.client.model.changestream.OperationType.*;
 
 @Repository
 @Slf4j
@@ -23,7 +25,7 @@ public class ChatMessageRepositoryImpl implements ChatMessageCustomRepository {
           .watchCollection(ChatMessage.class)
 //          .resumeAt(bsonTimestamp)
           .listen()
-          .doOnNext(e -> log.info("event " + e))
+//          .doOnNext(e -> log.info("event " + e))
           .filter(event -> {
               log.debug("getOperationType:{}", event.getOperationType());
               return (event.getOperationType() == INSERT || event.getOperationType() == UPDATE || event.getOperationType() == REPLACE);

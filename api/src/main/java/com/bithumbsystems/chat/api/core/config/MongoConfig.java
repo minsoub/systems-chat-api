@@ -39,7 +39,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
 
     @Override
     public MongoClient reactiveMongoClient() {
-        log.info("Applying AWS DocumentDB Configuration");
+        log.debug("Applying AWS DocumentDB Configuration");
         MongoClientSettings settings = configureClientSettings();
         return MongoClients.create(settings);
     }

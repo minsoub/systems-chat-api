@@ -24,6 +24,17 @@ management:
       exposure:
         include: metrics, prometheus, health
 
+---
+spring:
+  config:
+    import: classpath:aws-properties.yml
+    activate:
+      on-profile: local
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test
 logging:
   level:
     root: ${chat.api.logging.level.root:DEBUG}
@@ -42,20 +53,6 @@ logging:
       spring:
         cloud: INFO
   config: classpath:logback-spring-${spring.profiles.active}.xml
-
----
-spring:
-  config:
-    import: classpath:aws-properties.yml
-    activate:
-      on-profile: local
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: test
-logging:
-  config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
 spring:
   config:
@@ -63,6 +60,22 @@ spring:
     activate:
       on-profile: dev
 logging:
+  level:
+    root: ${chat.api.logging.level.root:INFO}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${chat.api.logging.level.mongo:INFO}
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+    io:
+      spring:
+        cloud: INFO
   config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
 spring:
@@ -71,6 +84,22 @@ spring:
     activate:
       on-profile: eks-dev
 logging:
+  level:
+    root: ${chat.api.logging.level.root:INFO}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${chat.api.logging.level.mongo:INFO}
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+    io:
+      spring:
+        cloud: INFO
   config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
 spring:
@@ -79,6 +108,22 @@ spring:
     activate:
       on-profile: qa
 logging:
+  level:
+    root: ${chat.api.logging.level.root:INFO}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${chat.api.logging.level.mongo:INFO}
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+    io:
+      spring:
+        cloud: INFO
   config: classpath:logback-spring-${spring.profiles.active}.xml
 ---
 spring:
@@ -87,4 +132,20 @@ spring:
     activate:
       on-profile: prod
 logging:
+  level:
+    root: ${chat.api.logging.level.root:INFO}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${chat.api.logging.level.mongo:INFO}
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+    io:
+      spring:
+        cloud: INFO
   config: classpath:logback-spring-${spring.profiles.active}.xml

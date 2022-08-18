@@ -30,19 +30,19 @@ class MessageController {
 
     @MessageMapping("/")
     public String health() {
-        log.info("Creating new message");
+        log.debug("Creating new message");
         return "OK";
     }
 
     @MessageMapping("create-chat")
     public Mono<ChatChannel> createChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
-        log.info("Create Chat");
+        log.debug("Create Chat");
         return chatService.createChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId());
     }
 
     @MessageMapping("join-chat")
     public Mono<List<ChatMessageResponse>> joinChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
-        log.info("Join Chat");
+        log.debug("Join Chat");
         return chatService.connectChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId())
             .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate));
     }
@@ -55,8 +55,8 @@ class MessageController {
     @MessageMapping("channel-chat-message")
     public Flux<MessageResponse> sendMessagesChannel(final Flux<ChannelRequest> channelRequests, @AuthenticationPrincipal final Account account) {
         return channelRequests.flatMap(channelRequest -> chatWatcherService.channelMessages(channelRequest)
-            .doOnNext(request -> log.info("Message reply {}", request))
-            .doOnSubscribe(subscription -> log.info("Subscribing to watcher : " + account.getAccountId()))
+//            .doOnNext(request -> log.info("Message reply {}", request))
+//            .doOnSubscribe(subscription -> log.info("Subscribing to watcher : " + account.getAccountId()))
             .doOnError(throwable -> log.error(throwable.getMessage())));
     }
 

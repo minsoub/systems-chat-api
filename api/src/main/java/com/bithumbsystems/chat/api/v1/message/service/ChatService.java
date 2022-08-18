@@ -57,13 +57,12 @@ class ChatService {
   public Mono<Set<String>> getChatRooms(final Account account, final String siteId) {
     return chatChannelDomainService.findByAccountIdAndRoleAndSiteId(account.getAccountId(),
             account.getRole(), siteId)
-        .doOnNext(chatChannel -> log.info("found user {} {}", chatChannel.getAccountId(),
-            chatChannel.getRole()))
+//        .doOnNext(chatChannel -> log.info("found user {} {}", chatChannel.getAccountId(), chatChannel.getRole()))
         .flatMapIterable(ChatChannel::getChatRooms)
         .collect(Collectors.toSet())
-        .doOnNext(uuids -> log.info("set size {}", uuids.size()))
-        .defaultIfEmpty(Set.of())
-        .doOnNext(uuids -> log.info("set size {}", uuids.size()));
+//        .doOnNext(uuids -> log.info("set size {}", uuids.size()))
+        .defaultIfEmpty(Set.of());
+//        .doOnNext(uuids -> log.info("set size {}", uuids.size()));
   }
 
   public Mono<ChatMessageResponse> saveMessage(final MessageRequest chatMessageRequest,
