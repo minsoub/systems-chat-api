@@ -1,5 +1,6 @@
 server:
   shutdown: graceful
+  port: 8080
 spring:
   main:
     allow-bean-definition-overriding: true
@@ -16,7 +17,7 @@ spring:
       uuid-representation: standard
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
 
-spring.main.web-application-type: none
+spring.main.web-application-type: REACTIVE
 
 management:
   endpoints:
