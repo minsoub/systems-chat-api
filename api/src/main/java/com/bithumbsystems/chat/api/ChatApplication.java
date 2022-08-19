@@ -26,6 +26,8 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 public class ChatApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(ChatApplication.class, args);
+    SpringApplication app = new SpringApplication(ChatApplication.class);
+    app.addListeners(new ApplicationPidFileWriter());
+    app.run(args);
   }
 }
