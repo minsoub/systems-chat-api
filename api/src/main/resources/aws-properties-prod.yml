@@ -6,7 +6,7 @@ cloud:
     stack:
       auto: ${chat.aws.stack.auto:false}
     s3:
-      bucket: ${chat.aws.s3.bucket:lrc-dev-bucket}
+      bucket: ${chat.aws.s3.bucket:bithumb-bs-lrc-bucket}
     ssm:
       endpoint: https://vpce-0503f36fb711a0ebc-i4lm0gm7.ssm.ap-northeast-2.vpce.amazonaws.com
     kms:
