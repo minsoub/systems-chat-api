@@ -15,6 +15,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 /**
  * The type Aes 256 util.
@@ -76,7 +77,6 @@ public class AES256Util {
             cipherMessage = java.util.Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
         } catch(Exception e) {
             log.error(e.getMessage());
-            e.printStackTrace();
         }
 
         return cipherMessage;
@@ -87,6 +87,9 @@ public class AES256Util {
         var plainMessage = "";
 
         try {
+            if(!StringUtils.hasLength(cipherMessage)) {
+                return "";
+            }
             byte[] decode = Base64.getDecoder().decode(cipherMessage.getBytes(UTF_8));
 
             // get back the iv and salt from the cipher text
@@ -111,7 +114,6 @@ public class AES256Util {
             plainMessage = new String(plainText, UTF_8);
         } catch (Exception e) {
             log.error(e.getMessage());
-            e.printStackTrace();
         }
         return plainMessage;
     }
@@ -144,7 +146,6 @@ public class AES256Util {
             cipherMessage = java.util.Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
         } catch(Exception e) {
             log.error(e.getMessage());
-            e.printStackTrace();
         }
 
         return cipherMessage;
