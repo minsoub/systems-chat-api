@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfigurat
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
+import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.data.mongodb.config.EnableReactiveMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
@@ -26,6 +27,8 @@ import org.springframework.web.reactive.config.EnableWebFlux;
 public class ChatApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(ChatApplication.class, args);
+    SpringApplication app = new SpringApplication(ChatApplication.class);
+    app.addListeners(new ApplicationPidFileWriter());
+    app.run(args);
   }
 }
