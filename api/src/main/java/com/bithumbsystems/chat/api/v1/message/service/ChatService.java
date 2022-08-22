@@ -37,14 +37,10 @@ class ChatService {
         .flatMap(chatMessage -> Mono.just(ChatMessageResponse.builder()
             .id(chatMessage.getId())
             .accountId(chatMessage.getAccountId())
-//            .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
-//            .name(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getName()))  // new add
-//            .role(chatMessage.getRole())
-//            .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
-            .email(chatMessage.getEmail())
-            .name(chatMessage.getName())  // new add
+            .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
+            .name(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getName()))  // new add
             .role(chatMessage.getRole())
-            .content(chatMessage.getContent())
+            .content(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getContent()))
             .chatRoom(chatMessage.getChatRoom())
             .createDate(chatMessage.getCreateDate())
             .build()));
