@@ -120,7 +120,7 @@ public class AES256Util {
 
     public static String encryptAES(String password, String plainMessage, String saltKey, String ivKey) {
         var cipherMessage = "";
-
+        ByteBuffer byteBuffer = null;
         try {
             byte[] salt = org.apache.commons.codec.binary.Base64.decodeBase64(saltKey.getBytes(StandardCharsets.UTF_8));
             byte[] iv = org.apache.commons.codec.binary.Base64.decodeBase64(ivKey.getBytes(StandardCharsets.UTF_8));
@@ -136,16 +136,20 @@ public class AES256Util {
             byte[] cipherText = cipher.doFinal(plainMessage.getBytes(UTF_8));
 
             // prefix IV and Salt to cipher text
-            byte[] cipherTextWithIvSalt = ByteBuffer.allocate(iv.length + salt.length + cipherText.length)
-                    .put(iv)
+            byteBuffer = ByteBuffer.allocate(iv.length + salt.length + cipherText.length);
+
+            byte[] cipherTextWithIvSalt = byteBuffer.put(iv)
                     .put(salt)
                     .put(cipherText)
                     .array();
-
-            // string representation, base64, send this string to other for decryption.
+                    // string representation, base64, send this string to other for decryption.
             cipherMessage = java.util.Base64.getEncoder().encodeToString(cipherTextWithIvSalt);
         } catch(Exception e) {
             log.error(e.getMessage());
+        } finally {
+            if(byteBuffer != null){
+                byteBuffer.clear();
+            }
         }
 
         return cipherMessage;
