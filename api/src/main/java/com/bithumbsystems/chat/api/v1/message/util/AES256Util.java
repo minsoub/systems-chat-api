@@ -85,7 +85,7 @@ public class AES256Util {
     // we need the same password, salt and iv to decrypt it
     public static String decryptAES(String password, String cipherMessage) {
         var plainMessage = "";
-
+        ByteBuffer byteBuffer = null;
         try {
             if(!StringUtils.hasLength(cipherMessage)) {
                 return "";
@@ -93,16 +93,16 @@ public class AES256Util {
             byte[] decode = Base64.getDecoder().decode(cipherMessage.getBytes(UTF_8));
 
             // get back the iv and salt from the cipher text
-            ByteBuffer bb = ByteBuffer.wrap(decode);
+            byteBuffer = ByteBuffer.wrap(decode);
 
             byte[] iv = new byte[IV_LENGTH_BYTE];
-            bb.get(iv);
+            byteBuffer.get(iv);
 
             byte[] salt = new byte[SALT_LENGTH_BYTE];
-            bb.get(salt);
+            byteBuffer.get(salt);
 
-            byte[] cipherText = new byte[bb.remaining()];
-            bb.get(cipherText);
+            byte[] cipherText = new byte[byteBuffer.remaining()];
+            byteBuffer.get(cipherText);
 
             // get back the aes key from the same password and salt
             SecretKey aesKeyFromPassword = getAESKeyFromPassword(password.toCharArray(), salt);
@@ -114,6 +114,10 @@ public class AES256Util {
             plainMessage = new String(plainText, UTF_8);
         } catch (Exception e) {
             log.error(e.getMessage());
+        } finally {
+            if(byteBuffer != null){
+                byteBuffer.clear();
+            }
         }
         return plainMessage;
     }
