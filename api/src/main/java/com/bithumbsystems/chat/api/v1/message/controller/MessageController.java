@@ -1,5 +1,7 @@
 package com.bithumbsystems.chat.api.v1.message.controller;
 
+import static com.bithumbsystems.chat.api.v1.message.util.GsonUtil.gson;
+
 import com.bithumbsystems.chat.api.v1.message.model.request.ChannelRequest;
 import com.bithumbsystems.chat.api.v1.message.model.request.JoinChatRequest;
 import com.bithumbsystems.chat.api.v1.message.model.request.MessageRequest;
@@ -9,11 +11,14 @@ import com.bithumbsystems.chat.api.v1.message.service.ChatService;
 import com.bithumbsystems.chat.api.v1.message.service.ChatWatcherService;
 import com.bithumbsystems.persistence.mongodb.message.model.Account;
 import com.bithumbsystems.persistence.mongodb.message.model.entity.ChatChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -53,11 +58,17 @@ class MessageController {
     }
 
     @MessageMapping("channel-chat-message")
-    public Flux<MessageResponse> sendMessagesChannel(final Flux<ChannelRequest> channelRequests, @AuthenticationPrincipal final Account account) {
-        return channelRequests.flatMap(channelRequest -> chatWatcherService.channelMessages(channelRequest)
-//            .doOnNext(request -> log.info("Message reply {}", request))
-//            .doOnSubscribe(subscription -> log.info("Subscribing to watcher : " + account.getAccountId()))
-            .doOnError(throwable -> log.error(throwable.getMessage())));
+    public Flux<MessageResponse> sendMessagesChannel(final Flux<DataBuffer> channelRequests, @AuthenticationPrincipal final Account account) {
+        return DataBufferUtils.join(channelRequests)
+            .flatMap(dataBuffer -> {
+                byte[] requestBodyByteArray = new byte[dataBuffer.readableByteCount()];
+                dataBuffer.read(requestBodyByteArray);
+                String requestBodyString = new String(requestBodyByteArray, StandardCharsets.UTF_8);
+                DataBufferUtils.release(dataBuffer);
+                var channelRequest = gson.fromJson(requestBodyString, ChannelRequest.class);
+                return Mono.just(channelRequest);
+            }).flatMapMany(chatWatcherService::channelMessages)
+            .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 
     @MessageMapping("send-chat-message")
