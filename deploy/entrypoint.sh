@@ -14,4 +14,4 @@ export AWS_SECRET_ACCESS_KEY=$3
 echo $AWS_ACCESS_KEY_ID
 echo $AWS_SECRET_ACCESS_KEY
 
-java -Dspring.profiles.active=$1 -jar ./systems-chat-api.jar -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app -Dio.netty.leakDetectionLevel=advanced
+java -Dspring.profiles.active=$1 -jar ./systems-chat-api.jar -XX:MaxDirectMemorySize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/app -Dio.netty.leakDetectionLevel=advanced
