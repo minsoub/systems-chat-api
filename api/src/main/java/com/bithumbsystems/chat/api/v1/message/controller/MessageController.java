@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -33,11 +34,17 @@ class MessageController {
     private final ChatService chatService;
     private final ChatWatcherService chatWatcherService;
 
-    @Deprecated
+    @Profile("local")
     @MessageMapping("create-chat")
     public Mono<ChatChannel> createChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
         log.debug("Create Chat");
         return chatService.createChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId());
+    }
+
+    @Profile("local")
+    @MessageMapping("get-chat-rooms")
+    public Mono<Set<String>> getUserChats(final String siteId, @AuthenticationPrincipal final Account account) {
+        return chatService.getChatRooms(account, siteId);
     }
 
     @MessageMapping("join-chat")
@@ -45,12 +52,6 @@ class MessageController {
         log.debug("Join Chat");
         return chatService.connectChatRoom(account, joinChatRequest.getChatRoom(), joinChatRequest.getSiteId())
             .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate));
-    }
-
-    @Deprecated
-    @MessageMapping("get-chat-rooms")
-    public Mono<Set<String>> getUserChats(final String siteId, @AuthenticationPrincipal final Account account) {
-        return chatService.getChatRooms(account, siteId);
     }
 
     @MessageMapping("channel-chat-message")
