@@ -33,12 +33,7 @@ class MessageController {
     private final ChatService chatService;
     private final ChatWatcherService chatWatcherService;
 
-    @MessageMapping("/")
-    public String health() {
-        log.debug("Creating new message");
-        return "OK";
-    }
-
+    @Deprecated
     @MessageMapping("create-chat")
     public Mono<ChatChannel> createChat(final JoinChatRequest joinChatRequest, @AuthenticationPrincipal final Account account) {
         log.debug("Create Chat");
@@ -52,14 +47,15 @@ class MessageController {
             .collectSortedList(Comparator.comparing(ChatMessageResponse::getCreateDate));
     }
 
+    @Deprecated
     @MessageMapping("get-chat-rooms")
     public Mono<Set<String>> getUserChats(final String siteId, @AuthenticationPrincipal final Account account) {
         return chatService.getChatRooms(account, siteId);
     }
 
     @MessageMapping("channel-chat-message")
-    public Flux<MessageResponse> sendMessagesChannel(final Flux<DataBuffer> channelRequests, @AuthenticationPrincipal final Account account) {
-        return DataBufferUtils.join(channelRequests)
+    public Flux<MessageResponse> sendMessagesChannel(final Flux<DataBuffer> channelRequestsFlux, @AuthenticationPrincipal final Account account) {
+        return DataBufferUtils.join(channelRequestsFlux)
             .flatMap(dataBuffer -> {
                 byte[] requestBodyByteArray = new byte[dataBuffer.readableByteCount()];
                 dataBuffer.read(requestBodyByteArray);
@@ -67,7 +63,7 @@ class MessageController {
                 DataBufferUtils.release(dataBuffer);
                 var channelRequest = gson.fromJson(requestBodyString, ChannelRequest.class);
                 return Mono.just(channelRequest);
-            }).flatMapMany(chatWatcherService::channelMessages)
+            }).flatMapMany(channelRequests -> chatWatcherService.channelMessages(channelRequests, account))
             .doOnError(throwable -> log.error(throwable.getMessage()));
     }
 

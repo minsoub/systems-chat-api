@@ -17,7 +17,7 @@ spring:
       uuid-representation: standard
       field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
   pid:
-    file: ${instance.pid}
+    file: ${instance.pid:25809}
 
 spring.main.web-application-type: REACTIVE
 

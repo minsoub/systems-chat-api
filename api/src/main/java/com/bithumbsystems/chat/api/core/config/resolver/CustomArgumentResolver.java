@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class CustomArgumentResolver extends AuthenticationPrincipalArgumentResolver {
 
+
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
     Class<?> parameterType = parameter.getParameterType();
