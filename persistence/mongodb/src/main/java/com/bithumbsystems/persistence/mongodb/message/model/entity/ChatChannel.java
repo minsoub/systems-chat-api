@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document("chat_channel")
 @Getter
 @Setter
-@CompoundIndex(name = "role_account_id", def = "{'account_id' : 1, 'role': 1}", unique = true)
+@CompoundIndex(def = "{'account_id' : 1, 'role': 1}", unique = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatChannel {

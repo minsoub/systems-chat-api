@@ -21,8 +21,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@CompoundIndex(name = "site_chat_room", def = "{'chat_room' : 1, 'site_id': 1, 'is_delete': 1}")
+@CompoundIndex(def = "{'chat_room' : 1, 'site_id': 1, 'is_delete': 1}")
 public class ChatMessage {
+
     @Id
     private String id;
     private String accountId;
