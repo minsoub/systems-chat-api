@@ -70,7 +70,7 @@ class ChatService {
         .flatMap(chatChannel -> chatMessageDomainService.save(
                 ChatMessage.builder()
                     .accountId(chatChannel.getAccountId())
-                    .email(chatChannel.getEmail())
+                    .email(account.getEmail())
                     .name(AES256Util.encryptAES(
                         awsProperties.getKmsKey(),
                         AES256Util.decryptAES(awsProperties.getCryptoKey(),
@@ -90,7 +90,7 @@ class ChatService {
             .flatMap(chatMessage -> Mono.just(ChatMessageResponse.builder()
                 .id(chatMessage.getId())
                 .accountId(chatMessage.getAccountId())
-                .email(AES256Util.decryptAES(awsProperties.getKmsKey(), chatMessage.getEmail()))
+                .email(AES256Util.decryptAES(awsProperties.getKmsKey(), account.getEmail()))
                 .name(AES256Util.decryptAES(awsProperties.getKmsKey(),
                     chatMessage.getName())) // new add
                 .role(chatMessage.getRole())
