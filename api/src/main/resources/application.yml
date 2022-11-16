@@ -107,6 +107,30 @@ logging:
 ---
 spring:
   config:
+    import: classpath:aws-properties-eks-prod.yml
+    activate:
+      on-profile: eks-prod
+logging:
+  level:
+    root: ${chat.api.logging.level.root:INFO}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${chat.api.logging.level.mongo:INFO}
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+    io:
+      spring:
+        cloud: INFO
+  config: classpath:logback-spring-${spring.profiles.active}.xml
+---
+spring:
+  config:
     import: classpath:aws-properties-qa.yml
     activate:
       on-profile: qa

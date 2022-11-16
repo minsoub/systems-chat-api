@@ -18,7 +18,7 @@ import java.net.URI;
 @Getter
 @Setter
 @Configuration
-@Profile("dev|qa|prod|eks-dev")
+@Profile("dev|qa|prod|eks-dev|eks-prod")
 public class AwsConfig {
 
     private final AwsProperties awsProperties;

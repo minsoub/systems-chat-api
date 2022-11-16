@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  namespace: systems-dev-ns
+  namespace: systems-prod-ns
   name: systems-chat-api-ingress
   annotations:
     kubernetes.io/ingress.class: alb
