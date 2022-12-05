@@ -22,7 +22,7 @@ import java.net.URI;
 @Setter
 @Configuration
 @RequiredArgsConstructor
-@Profile("local")
+@Profile("local|localstack")
 public class LocalAwsConfig {
 
     @Value("${cloud.aws.credentials.profile-name}")

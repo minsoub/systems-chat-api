@@ -59,6 +59,35 @@ logging:
 ---
 spring:
   config:
+    import: classpath:aws-properties-localstack.yml
+    activate:
+      on-profile: localstack
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test
+logging:
+  level:
+    root: ${chat.api.logging.level.root:DEBUG}
+    org.springframework.data.convert.CustomConversions: ERROR
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: ${chat.api.logging.level.mongo:INFO}
+    com:
+      amazonaws:
+        util:
+          EC2MetadataUtils: error
+    io:
+      spring:
+        cloud: INFO
+  config: classpath:logback-spring-local.xml
+---
+spring:
+  config:
     import: classpath:aws-properties-dev.yml
     activate:
       on-profile: dev
